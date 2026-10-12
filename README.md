@@ -36,7 +36,6 @@
         .tag-raw { color: #ff9800; }
         .tag-graded { color: #ffd700; }
 
-        /* Animation styling for pack opening */
         .pack-rip-area { text-align: center; background: #18181c; padding: 20px; border-radius: 10px; border: 2px dashed #444; margin-top: 15px; }
         .card-reveal-box {
             perspective: 1000px;
@@ -87,7 +86,7 @@
     <div class="header">
         <div>
             <h1>TCG Sourcing & Market Simulator</h1>
-            <div style="font-size: 12px; color: #4CAF50;">✨ Pack Animation Module Active</div>
+            <div style="font-size: 12px; color: #4CAF50;">✨ Custom Grading & Value Tiering Enabled</div>
         </div>
         <div>
             <div class="cash">Cash: $<span id="cash">1000.00</span></div>
@@ -129,8 +128,8 @@
             </div>
 
             <div class="card-panel">
-                <h2>🔬 4. Grading Service (PSA/CGC/Beckett)</h2>
-                <p style="font-size: 13px; color: #aaa;">Submit raw cards to grade. Increases resale value based on sub-scores!</p>
+                <h2>🔬 4. Grading Service (Choose Company)</h2>
+                <p style="font-size: 13px; color: #aaa;">Submit raw cards to PSA, CGC, or Beckett. Higher raw value cards require higher service tier fees!</p>
                 <div id="gradingQueue"></div>
             </div>
         </div>
@@ -185,6 +184,12 @@
             if (grade === 8.5) return 1.1;
             if (grade === 8.0) return 0.9;
             return 0.5;
+        }
+
+        function getGradingFee(rawVal) {
+            if (rawVal >= 50) return 50;  // High value declared tier
+            if (rawVal >= 10) return 25;  // Mid value declared tier
+            return 15;                   // Standard tier
         }
 
         function renderShop() {
@@ -282,13 +287,7 @@
                 name: name,
                 tier: tier,
                 baseValue: baseVal,
-                state: 'Raw',
-                conditionSeed: {
-                    centering: Math.random() * (10 - 7) + 7,
-                    corners: Math.random() * (10 - 7) + 7,
-                    edges: Math.random() * (10 - 7) + 7,
-                    surface: Math.random() * (10 - 7) + 7
-                }
+                state: 'Raw'
             };
         }
 
@@ -313,7 +312,6 @@
             let btn = document.getElementById('actionCardBtn');
 
             if (!isFlipped) {
-                // Flip card face up
                 inner.classList.add('flipped');
                 inventory.push(currentPackCards[currentCardIndex]);
                 isFlipped = true;
@@ -325,7 +323,6 @@
                 }
                 updateUI();
             } else {
-                // Move to next card or close
                 currentCardIndex++;
                 if (currentCardIndex < currentPackCards.length) {
                     prepNextCardForAnimation();
@@ -340,6 +337,7 @@
             if (inventory.length === 0) html = '<p style="font-size:13px; color:#888;">No cards in collection.</p>';
             inventory.forEach(card => {
                 let val = getItemMarketValue(card);
+                let fee = getGradingFee(card.baseValue);
                 let stateTag = card.state === 'Graded' 
                     ? `<span class="tag tag-graded">${card.gradingInfo.company} ${card.gradingInfo.finalGrade}${card.gradingInfo.isBlackLabel ? ' (BLACK LABEL)' : ''}</span>`
                     : `<span class="tag tag-raw">Raw</span>`;
@@ -351,7 +349,7 @@
                             <div style="font-size:12px; color:#aaa;">Market Value: $${val.toFixed(2)}</div>
                         </div>
                         <div>
-                            ${card.state === 'Raw' ? `<button onclick="gradeCard('${card.id}')" style="font-size:11px;">Grade ($15)</button>` : ''}
+                            ${card.state === 'Raw' ? `<button onclick="gradeCard('${card.id}')" style="font-size:11px;">Grade ($${fee})</button>` : ''}
                             <button onclick="sellCard('${card.id}')" style="font-size:11px; background:#4CAF50; color:#fff;">Sell</button>
                         </div>
                     </div>`;
@@ -374,19 +372,40 @@
             }
         }
 
+        // --- ENHANCED GRADING SYSTEM ---
         function gradeCard(cardId) {
             let card = inventory.find(c => c.id == cardId);
             if (!card) return;
-            if (cash < 15) { alert("Not enough cash to grade ($15 fee)!"); return; }
 
-            cash -= 15;
-            let company = Math.random() > 0.8 ? 'Beckett' : 'PSA';
-            let seed = card.conditionSeed;
-            let lowest = Math.min(seed.centering, seed.corners, seed.edges, seed.surface);
-            let avg = (seed.centering + seed.corners + seed.edges + seed.surface) / 4;
-            
-            let finalGrade = Math.min(10.0, Math.min(Math.floor(avg * 2) / 2, lowest + 0.5));
-            let isBlackLabel = (company === 'Beckett' && finalGrade === 10 && Math.random() <= 0.03);
+            let fee = getGradingFee(card.baseValue);
+            if (cash < fee) { 
+                alert(`Not enough cash! This card requires a $${fee} grading fee based on its raw market value.`); 
+                return; 
+            }
+
+            // Player selects grading company
+            let choice = prompt("Select Grading Company:\n1 - PSA\n2 - CGC\n3 - Beckett (BGS)", "1");
+            let company = 'PSA';
+            if (choice === '2') company = 'CGC';
+            if (choice === '3') company = 'Beckett';
+
+            cash -= fee;
+
+            // Roll biased towards 9s and 10s
+            // Distribution: 50% Gem Mint 10, 35% Mint 9, 10% Near-Mint 8.5, 5% Below 8
+            let roll = Math.random() * 100;
+            let finalGrade = 10;
+
+            if (roll > 50 && roll <= 85) {
+                finalGrade = 9.0;
+            } else if (roll > 85 && roll <= 95) {
+                finalGrade = 8.5;
+            } else if (roll > 95) {
+                finalGrade = 8.0;
+            }
+
+            // Beckett Black Label chance on 10s
+            let isBlackLabel = (company === 'Beckett' && finalGrade === 10 && Math.random() <= 0.08);
 
             card.state = 'Graded';
             card.gradingInfo = {
@@ -396,6 +415,7 @@
             };
 
             updateUI();
+            alert(`🎉 Grading complete with ${company}! Result: ${company} ${finalGrade}${isBlackLabel ? ' (BLACK LABEL!)' : ''}`);
         }
 
         updateUI();
