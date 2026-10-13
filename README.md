@@ -36,48 +36,74 @@
         .tag-raw { color: #ff9800; }
         .tag-graded { color: #ffd700; }
 
-        .pack-rip-area { text-align: center; background: #18181c; padding: 20px; border-radius: 10px; border: 2px dashed #444; margin-top: 15px; }
-        .card-reveal-box {
-            perspective: 1000px;
-            margin: 20px auto;
-            width: 220px;
-            height: 310px;
+        /* REALISTIC PACK OPENING ANIMATION STYLES */
+        .pack-rip-area { text-align: center; background: #18181c; padding: 20px; border-radius: 10px; border: 2px dashed #444; margin-top: 15px; position: relative; min-height: 420px; overflow: hidden; }
+        
+        .pack-wrapper {
+            width: 180px; height: 280px; background: linear-gradient(135deg, #e63946, #b7094c);
+            margin: 20px auto; border-radius: 12px; border: 3px solid #ffb703;
+            display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 20px;
+            color: #fff; cursor: pointer; position: relative; transition: transform 0.3s;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
         }
-        .card-inner {
+        .pack-wrapper:hover { transform: scale(1.05); }
+        .pack-wrapper.ripping {
+            animation: ripPack 0.6s forwards ease-in-out;
+        }
+
+        @keyframes ripPack {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(-5deg); opacity: 0.8; }
+            100% { transform: scale(0.2) rotate(20deg); opacity: 0; }
+        }
+
+        .card-stack {
             position: relative;
-            width: 100%;
-            height: 100%;
-            text-align: center;
-            transition: transform 0.6s;
-            transform-style: preserve-3d;
-            border-radius: 12px;
+            width: 200px;
+            height: 280px;
+            margin: 20px auto;
         }
-        .card-inner.flipped {
-            transform: rotateY(180deg);
-        }
-        .card-front, .card-back {
+
+        .physical-card {
             position: absolute;
             width: 100%;
             height: 100%;
-            backface-visibility: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            border-radius: 12px;
-            padding: 15px;
-            border: 2px solid #444;
+            border-radius: 10px;
+            perspective: 1000px;
+            cursor: pointer;
+            transition: transform 0.5s ease, opacity 0.5s ease;
         }
-        .card-back {
-            background: linear-gradient(135deg, #2b2b36, #1a1a22);
-            color: #ffcc00;
-            font-size: 20px;
-            font-weight: bold;
+
+        .physical-card-inner {
+            width: 100%; height: 100%; position: relative;
+            transform-style: preserve-3d; transition: transform 0.6s;
+            border-radius: 10px;
         }
-        .card-front {
-            background: #25252e;
-            color: #fff;
+
+        .physical-card.flipped .physical-card-inner {
             transform: rotateY(180deg);
+        }
+
+        .physical-card-front, .physical-card-back {
+            position: absolute; width: 100%; height: 100%;
+            backface-visibility: hidden; border-radius: 10px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            border: 2px solid #444; padding: 10px; box-sizing: border-box;
+        }
+
+        .physical-card-back {
+            background: linear-gradient(135deg, #1d3557, #457b9d);
+            color: #f1faee; font-weight: bold; border-color: #a8dadc;
+        }
+
+        .physical-card-front {
+            background: #25252e; color: #fff; transform: rotateY(180deg);
+        }
+
+        .physical-card.slide-away {
+            transform: translateX(300px) rotate(20deg) !important;
+            opacity: 0;
+            pointer-events: none;
         }
     </style>
 </head>
@@ -86,11 +112,11 @@
     <div class="header">
         <div>
             <h1>TCG Sourcing & Market Simulator</h1>
-            <div style="font-size: 12px; color: #4CAF50;">✨ Custom Grading & Value Tiering Enabled</div>
+            <div style="font-size: 12px; color: #4CAF50;">✨ Realistic Pack Rip Engine Active</div>
         </div>
         <div>
-            <div class="cash">Cash: $<span id="cash">1000.00</span></div>
-            <div class="net-worth">Portfolio Net Worth: $<span id="netWorth">1000.00</span></div>
+            <div class="cash">Cash: $<span id="cash">300.00</span></div>
+            <div class="net-worth">Portfolio Net Worth: $<span id="netWorth">300.00</span></div>
         </div>
     </div>
 
@@ -105,17 +131,19 @@
             <div class="card-panel">
                 <h2>✂️ 2. Sealed Inventory & Pack Ripping</h2>
                 <div id="sealedInventory"></div>
+                
                 <div id="packRipArea" class="pack-rip-area" style="display:none;">
-                    <h3 id="packProgressTitle">Opening Pack...</h3>
+                    <h3 id="packStageTitle">Click Pack to Rip Open!</h3>
                     
-                    <div class="card-reveal-box">
-                        <div id="cardInner" class="card-inner">
-                            <div class="card-back">TCG PACK<br><span style="font-size: 12px; color: #aaa; margin-top: 10px;">Click Flip</span></div>
-                            <div id="cardFront" class="card-front">---</div>
-                        </div>
+                    <!-- Pack Sealed Graphic -->
+                    <div id="packGraphic" class="pack-wrapper" onclick="startRipAnimation()">
+                        BOOSTER PACK<br><span style="font-size:12px;">(Click to Rip ✂️)</span>
                     </div>
 
-                    <button id="actionCardBtn" onclick="handleCardAction()">Flip Card</button>
+                    <!-- Card Stack -->
+                    <div id="cardStack" class="card-stack" style="display:none;"></div>
+
+                    <p id="packInstruction" style="font-size: 13px; color: #aaa; margin-top: 15px; display:none;">Click top card to flip face-up, then click again to reveal the next card!</p>
                 </div>
             </div>
         </div>
@@ -136,12 +164,12 @@
     </div>
 
     <script>
-        let cash = 1000.00;
+        let cash = 300.00; // Updated starting cash to $300
         let inventory = [];
         let sealedVault = [];
         let currentPackCards = [];
+        let activeCardElements = [];
         let currentCardIndex = 0;
-        let isFlipped = false;
 
         const COMMONS = ["Pidgey", "Rattata", "Caterpie", "Weedle", "Metapod", "Kakuna", "Spearow", "Ekans", "Oddish", "Tentacool", "Zubat", "Geodude", "Magnemite"];
         const UNCOMMONS = ["Gloom", "Weepinbell", "Golbat", "Graveler", "Magneton", "Poliwhirl", "Haunter", "Kadabra", "Machoke"];
@@ -187,9 +215,9 @@
         }
 
         function getGradingFee(rawVal) {
-            if (rawVal >= 50) return 50;  // High value declared tier
-            if (rawVal >= 10) return 25;  // Mid value declared tier
-            return 15;                   // Standard tier
+            if (rawVal >= 50) return 50;
+            if (rawVal >= 10) return 25;
+            return 15;
         }
 
         function renderShop() {
@@ -225,7 +253,7 @@
                     <div class="market-item">
                         <div><strong>${item.name}</strong> <span class="tag tag-sealed">Sealed</span></div>
                         <div>
-                            <button onclick="ripProduct(${item.id})">Rip Now ✂️</button>
+                            <button onclick="ripProduct(${item.id})">Rip Pack ✂️</button>
                         </div>
                     </div>`;
             });
@@ -237,14 +265,15 @@
             if (index === -1) return;
             let item = sealedVault.splice(index, 1)[0];
             
-            currentPackCards = [];
-            for (let i = 0; i < item.packs; i++) {
-                currentPackCards.push(...generateSinglePack());
-            }
+            currentPackCards = generateSinglePack();
 
-            currentCardIndex = 0;
             document.getElementById('packRipArea').style.display = 'block';
-            prepNextCardForAnimation();
+            document.getElementById('packGraphic').style.display = 'flex';
+            document.getElementById('packGraphic').classList.remove('ripping');
+            document.getElementById('cardStack').style.display = 'none';
+            document.getElementById('cardStack').innerHTML = '';
+            document.getElementById('packInstruction').style.display = 'none';
+            document.getElementById('packStageTitle').innerText = "Click Pack to Rip Open!";
             updateUI();
         }
 
@@ -291,43 +320,73 @@
             };
         }
 
-        function prepNextCardForAnimation() {
-            isFlipped = false;
-            document.getElementById('cardInner').classList.remove('flipped');
-            
-            let card = currentPackCards[currentCardIndex];
-            let frontHTML = `
-                <div style="font-size:12px; color:#aaa; text-transform:uppercase;">${card.tier}</div>
-                <div style="font-size:16px; font-weight:bold; margin: 10px 0;">${card.name}</div>
-                <div style="font-size:14px; color:#4CAF50;">$${card.baseValue.toFixed(2)}</div>
-            `;
-            document.getElementById('cardFront').innerHTML = frontHTML;
-            document.getElementById('cardFront').className = `card-front rarity-${card.tier}`;
-            document.getElementById('packProgressTitle').innerText = `Card ${currentCardIndex + 1} of ${currentPackCards.length}`;
-            document.getElementById('actionCardBtn').innerText = "Flip Card ✨";
+        function startRipAnimation() {
+            let packG = document.getElementById('packGraphic');
+            packG.classList.add('ripping');
+
+            setTimeout(() => {
+                packG.style.display = 'none';
+                renderPhysicalCardStack();
+            }, 500);
         }
 
-        function handleCardAction() {
-            let inner = document.getElementById('cardInner');
-            let btn = document.getElementById('actionCardBtn');
+        function renderPhysicalCardStack() {
+            let stackContainer = document.getElementById('cardStack');
+            stackContainer.style.display = 'block';
+            stackContainer.innerHTML = '';
+            document.getElementById('packInstruction').style.display = 'block';
+            document.getElementById('packStageTitle').innerText = "10 Cards Facedown Stacked";
 
-            if (!isFlipped) {
-                inner.classList.add('flipped');
-                inventory.push(currentPackCards[currentCardIndex]);
-                isFlipped = true;
-                
-                if (currentCardIndex < currentPackCards.length - 1) {
-                    btn.innerText = "Next Card ➡️";
-                } else {
-                    btn.innerText = "Finish Opening 🎉";
-                }
+            activeCardElements = [];
+            currentCardIndex = 0;
+
+            // Render all 10 cards stacked facedown
+            currentPackCards.forEach((card, idx) => {
+                let cardEl = document.createElement('div');
+                cardEl.className = 'physical-card';
+                // Offset stack slightly for depth
+                cardEl.style.top = `${idx * 2}px`;
+                cardEl.style.left = `${idx * 1}px`;
+                cardEl.style.zIndex = currentPackCards.length - idx;
+
+                cardEl.innerHTML = `
+                    <div class="physical-card-inner">
+                        <div class="physical-card-back">TCG CARD</div>
+                        <div class="physical-card-front rarity-${card.tier}">
+                            <div style="font-size:11px; color:#aaa; text-transform:uppercase;">${card.tier}</div>
+                            <div style="font-size:15px; font-weight:bold; margin:10px 0;">${card.name}</div>
+                            <div style="font-size:13px; color:#4CAF50;">$${card.baseValue.toFixed(2)}</div>
+                        </div>
+                    </div>`;
+
+                cardEl.onclick = () => handlePhysicalCardClick(idx, cardEl);
+                stackContainer.appendChild(cardEl);
+                activeCardElements.push({ el: cardEl, card: card, isFlipped: false });
+            });
+        }
+
+        function handlePhysicalCardClick(idx, el) {
+            if (idx !== currentCardIndex) return; // Only top card can be clicked
+
+            let cardData = activeCardElements[idx];
+
+            if (!cardData.isFlipped) {
+                // Flip top card face-up
+                cardData.el.classList.add('flipped');
+                cardData.isFlipped = true;
+                inventory.push(cardData.card);
                 updateUI();
+                document.getElementById('packStageTitle').innerText = `Card ${idx + 1} of 10 Revealed! Click again to slide.`;
             } else {
+                // Slide away revealed card to reveal card below
+                cardData.el.classList.add('slide-away');
                 currentCardIndex++;
+
                 if (currentCardIndex < currentPackCards.length) {
-                    prepNextCardForAnimation();
+                    document.getElementById('packStageTitle').innerText = `Card ${currentCardIndex + 1} of 10 Facedown`;
                 } else {
-                    document.getElementById('packRipArea').style.display = 'none';
+                    document.getElementById('packStageTitle').innerText = "🎉 All 10 Cards Claimed & Added to Inventory!";
+                    document.getElementById('packInstruction').style.display = 'none';
                 }
             }
         }
@@ -372,18 +431,16 @@
             }
         }
 
-        // --- ENHANCED GRADING SYSTEM ---
         function gradeCard(cardId) {
             let card = inventory.find(c => c.id == cardId);
             if (!card) return;
 
             let fee = getGradingFee(card.baseValue);
             if (cash < fee) { 
-                alert(`Not enough cash! This card requires a $${fee} grading fee based on its raw market value.`); 
+                alert(`Not enough cash! This card requires a $${fee} grading fee.`); 
                 return; 
             }
 
-            // Player selects grading company
             let choice = prompt("Select Grading Company:\n1 - PSA\n2 - CGC\n3 - Beckett (BGS)", "1");
             let company = 'PSA';
             if (choice === '2') company = 'CGC';
@@ -391,8 +448,6 @@
 
             cash -= fee;
 
-            // Roll biased towards 9s and 10s
-            // Distribution: 50% Gem Mint 10, 35% Mint 9, 10% Near-Mint 8.5, 5% Below 8
             let roll = Math.random() * 100;
             let finalGrade = 10;
 
@@ -404,7 +459,6 @@
                 finalGrade = 8.0;
             }
 
-            // Beckett Black Label chance on 10s
             let isBlackLabel = (company === 'Beckett' && finalGrade === 10 && Math.random() <= 0.08);
 
             card.state = 'Graded';
