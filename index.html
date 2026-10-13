@@ -42,9 +42,9 @@
         .pack-wrapper {
             width: 180px; height: 280px; background: linear-gradient(135deg, #e63946, #b7094c);
             margin: 40px auto; border-radius: 12px; border: 3px solid #ffb703;
-            display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 20px;
+            display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 18px; text-align: center;
             color: #fff; cursor: pointer; position: relative; transition: transform 0.3s;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5); padding: 10px;
         }
         .pack-wrapper:hover { transform: scale(1.05); }
         .pack-wrapper.ripping {
@@ -80,7 +80,6 @@
             border-radius: 10px;
         }
 
-        /* Simultaneous flip rule */
         .physical-card.flipped-all .physical-card-inner {
             transform: rotateY(180deg);
         }
@@ -101,7 +100,6 @@
             background: #25252e; color: #fff; transform: rotateY(180deg);
         }
 
-        /* Slide UP Animation when revealing next card */
         .physical-card.slide-up {
             transform: translateY(-400px) !important;
             opacity: 0;
@@ -114,7 +112,7 @@
     <div class="header">
         <div>
             <h1>TCG Sourcing & Market Simulator</h1>
-            <div style="font-size: 12px; color: #4CAF50;">✨ Authentic Pack Rip & Stack Engine</div>
+            <div style="font-size: 12px; color: #4CAF50;">✨ Multi-Pack Queue & Animation Engine Active</div>
         </div>
         <div>
             <div class="cash">Cash: $<span id="cash">300.00</span></div>
@@ -139,14 +137,14 @@
                     
                     <!-- Sealed Pack Graphic -->
                     <div id="packGraphic" class="pack-wrapper" onclick="startRipAnimation()">
-                        BOOSTER PACK<br><span style="font-size:12px;">(Click to Rip ✂️)</span>
+                        <span id="packGraphicLabel">BOOSTER PACK</span><br><span style="font-size:12px;">(Click to Rip ✂️)</span>
                     </div>
 
                     <!-- Card Stack -->
                     <div id="cardStack" class="card-stack" style="display:none;"></div>
 
                     <div id="packControls" style="display:none; margin-top:15px;">
-                        <button id="flipAllBtn" onclick="flipAllCardsTogether()">Flip Cards 🔄</button>
+                        <button id="actionBtn" onclick="handleActionButton()">Flip Cards 🔄</button>
                     </div>
 
                     <p id="packInstruction" style="font-size: 13px; color: #aaa; margin-top: 15px; display:none;">
@@ -175,6 +173,7 @@
         let cash = 300.00;
         let inventory = [];
         let sealedVault = [];
+        let activeProduct = null; // Tracks multi-pack openings (ETBs, Boxes, Blisters)
         let currentPackCards = [];
         let activeCardElements = [];
         let currentCardIndex = 0;
@@ -262,7 +261,7 @@
                     <div class="market-item">
                         <div><strong>${item.name}</strong> <span class="tag tag-sealed">Sealed</span></div>
                         <div>
-                            <button onclick="ripProduct(${item.id})">Rip Pack ✂️</button>
+                            <button onclick="ripProduct(${item.id})">Rip Product ✂️</button>
                         </div>
                     </div>`;
             });
@@ -274,17 +273,31 @@
             if (index === -1) return;
             let item = sealedVault.splice(index, 1)[0];
             
-            currentPackCards = generateSinglePack();
+            activeProduct = {
+                name: item.name,
+                packsLeft: item.packs,
+                totalPacks: item.packs
+            };
 
             document.getElementById('packRipArea').style.display = 'block';
+            setupNextPack();
+            updateUI();
+        }
+
+        function setupNextPack() {
+            currentPackCards = generateSinglePack();
+            currentCardIndex = 0;
+            isAllFlipped = false;
+
             document.getElementById('packGraphic').style.display = 'flex';
             document.getElementById('packGraphic').classList.remove('ripping');
+            document.getElementById('packGraphicLabel').innerText = `${activeProduct.name}\n(${activeProduct.packsLeft} Pack(s) Remaining)`;
+            
             document.getElementById('cardStack').style.display = 'none';
             document.getElementById('cardStack').innerHTML = '';
             document.getElementById('packControls').style.display = 'none';
             document.getElementById('packInstruction').style.display = 'none';
-            document.getElementById('packStageTitle').innerText = "Click Pack to Rip Open!";
-            updateUI();
+            document.getElementById('packStageTitle').innerText = `Ready to Rip ${activeProduct.name}!`;
         }
 
         function generateSinglePack() {
@@ -334,6 +347,8 @@
             let packG = document.getElementById('packGraphic');
             packG.classList.add('ripping');
 
+            activeProduct.packsLeft--;
+
             setTimeout(() => {
                 packG.style.display = 'none';
                 renderPhysicalCardStack();
@@ -347,13 +362,13 @@
             document.getElementById('packControls').style.display = 'block';
             document.getElementById('packInstruction').style.display = 'block';
             document.getElementById('packInstruction').innerText = 'All 10 cards are stacked facedown! Click "Flip Cards" to flip them together.';
-            document.getElementById('packStageTitle').innerText = "10 Cards Stacked Facedown";
+            document.getElementById('packStageTitle').innerText = `Opened Pack (${activeProduct.totalPacks - activeProduct.packsLeft}/${activeProduct.totalPacks}) - Stacked Facedown`;
 
             activeCardElements = [];
             currentCardIndex = 0;
             isAllFlipped = false;
+            document.getElementById('actionBtn').innerText = "Flip Cards 🔄";
 
-            // Render all 10 cards stacked facedown
             currentPackCards.forEach((card, idx) => {
                 let cardEl = document.createElement('div');
                 cardEl.className = 'physical-card';
@@ -377,44 +392,54 @@
             });
         }
 
-        function flipAllCardsTogether() {
-            if (isAllFlipped) return;
-            isAllFlipped = true;
+        function handleActionButton() {
+            if (!isAllFlipped) {
+                // Flip all together
+                isAllFlipped = true;
+                currentPackCards.forEach(c => inventory.push(c));
+                updateUI();
 
-            // Add cards to player inventory as they reveal
-            currentPackCards.forEach(c => inventory.push(c));
-            updateUI();
+                activeCardElements.forEach(item => {
+                    item.el.classList.add('flipped-all');
+                });
 
-            // Flip all card elements simultaneously
-            activeCardElements.forEach(item => {
-                item.el.classList.add('flipped-all');
-            });
-
-            document.getElementById('packControls').style.display = 'none';
-            document.getElementById('packStageTitle').innerText = `Card 1 of 10 Revealed! Click top card to slide UP.`;
-            document.getElementById('packInstruction').innerText = 'Click the top card to slide it UP and reveal the next card underneath!';
+                document.getElementById('packControls').style.display = 'none';
+                document.getElementById('packStageTitle').innerText = `Card 1 of 10 Revealed! Click top card to slide UP.`;
+                document.getElementById('packInstruction').innerText = 'Click the top card to slide it UP and reveal the next card underneath!';
+            }
         }
 
         function handleTopCardClick(idx) {
             if (!isAllFlipped) {
-                // If user clicks top card before hitting button, trigger flip together
-                flipAllCardsTogether();
+                handleActionButton();
                 return;
             }
 
-            if (idx !== currentCardIndex) return; // Only top card can slide up
+            if (idx !== currentCardIndex) return;
 
             let cardData = activeCardElements[idx];
-            
-            // Slide card UP off the top of the stack
             cardData.el.classList.add('slide-up');
             currentCardIndex++;
 
             if (currentCardIndex < currentPackCards.length) {
                 document.getElementById('packStageTitle').innerText = `Card ${currentCardIndex + 1} of 10 Revealed! Click to slide UP.`;
             } else {
-                document.getElementById('packStageTitle').innerText = "🎉 All 10 Cards Claimed & Added to Inventory!";
-                document.getElementById('packInstruction').innerText = "Pack opening complete!";
+                // Pack complete! Check if product has more packs remaining
+                if (activeProduct.packsLeft > 0) {
+                    document.getElementById('packStageTitle').innerText = `🎉 Pack Finished! ${activeProduct.packsLeft} pack(s) remaining in ${activeProduct.name}.`;
+                    document.getElementById('packControls').style.display = 'block';
+                    document.getElementById('actionBtn').innerText = "Open Next Pack ➡️";
+                    document.getElementById('actionBtn').onclick = setupNextPack;
+                    document.getElementById('packInstruction').style.display = 'none';
+                } else {
+                    document.getElementById('packStageTitle').innerText = "🎉 All Packs in Product Opened & Added to Inventory!";
+                    document.getElementById('packInstruction').innerText = "Product fully opened!";
+                    document.getElementById('packControls').style.display = 'block';
+                    document.getElementById('actionBtn').innerText = "Done / Close";
+                    document.getElementById('actionBtn').onclick = () => {
+                        document.getElementById('packRipArea').style.display = 'none';
+                    };
+                }
             }
         }
 
