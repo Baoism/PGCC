@@ -16,11 +16,15 @@
         @media(max-width: 900px) { .grid { grid-template-columns: 1fr; } }
 
         .card-panel { background: #1e1e24; padding: 20px; border-radius: 12px; border: 1px solid #333; margin-bottom: 20px; }
-        button { background: #ffcc00; color: #000; border: none; padding: 10px 18px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+        button { background: #ffcc00; color: #000; border: none; padding: 8px 14px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.2s; }
         button:hover { background: #e6b800; transform: translateY(-1px); }
         button:disabled { background: #555; color: #888; cursor: not-allowed; transform: none; }
         
         .market-item { display: flex; justify-content: space-between; align-items: center; background: #2a2a32; padding: 12px; border-radius: 8px; margin-bottom: 10px; }
+        .sealed-item { background: #2a2a32; padding: 12px; border-radius: 8px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; }
+        .sealed-header { display: flex; justify-content: space-between; align-items: center; }
+        .sealed-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
+        
         .card-item { background: #2a2a32; padding: 12px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #555; display: flex; justify-content: space-between; align-items: center; }
         
         .rarity-Common { border-color: #888; }
@@ -28,8 +32,8 @@
         .rarity-Rare { border-color: #2196F3; }
         .rarity-Bulk { border-color: #ff9800; }
         .rarity-Filler { border-color: #9c27b0; }
-        .rarity-HeavyHit { border-color: #e91e63; }
-        .rarity-Chase { border-color: #ffd700; background: #3b3112; box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); }
+        .rarity-HeavyHit { border-color: #e91e63; box-shadow: 0 0 10px rgba(233, 30, 99, 0.4); }
+        .rarity-Chase { border-color: #ffd700; background: #3b3112; box-shadow: 0 0 15px rgba(255, 215, 0, 0.6); }
 
         .tag { font-size: 11px; padding: 3px 6px; border-radius: 4px; background: #111; margin-left: 5px; text-transform: uppercase; }
         .tag-sealed { color: #00bcd4; }
@@ -105,6 +109,32 @@
             opacity: 0;
             pointer-events: none;
         }
+
+        /* OPEN ALL SUMMARY GRID */
+        .open-all-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 10px;
+            max-height: 350px;
+            overflow-y: auto;
+            margin-top: 15px;
+            padding: 10px;
+            background: #111;
+            border-radius: 8px;
+        }
+        .open-all-card {
+            background: #222;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            border: 1px solid #444;
+            text-align: center;
+        }
+        .open-all-card.is-hit {
+            border: 2px solid #ffd700;
+            background: #3a3010;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+        }
     </style>
 </head>
 <body>
@@ -112,7 +142,7 @@
     <div class="header">
         <div>
             <h1>TCG Sourcing & Market Simulator</h1>
-            <div style="font-size: 12px; color: #4CAF50;">✨ Multi-Pack Queue & Animation Engine Active</div>
+            <div style="font-size: 12px; color: #4CAF50;">✨ Multi-Mode Sourcing Engine Active</div>
         </div>
         <div>
             <div class="cash">Cash: $<span id="cash">300.00</span></div>
@@ -142,6 +172,9 @@
 
                     <!-- Card Stack -->
                     <div id="cardStack" class="card-stack" style="display:none;"></div>
+
+                    <!-- Open All Results Display -->
+                    <div id="openAllResults" class="open-all-grid" style="display:none;"></div>
 
                     <div id="packControls" style="display:none; margin-top:15px;">
                         <button id="actionBtn" onclick="handleActionButton()">Flip Cards 🔄</button>
@@ -173,11 +206,12 @@
         let cash = 300.00;
         let inventory = [];
         let sealedVault = [];
-        let activeProduct = null; // Tracks multi-pack openings (ETBs, Boxes, Blisters)
+        let activeProduct = null;
         let currentPackCards = [];
         let activeCardElements = [];
         let currentCardIndex = 0;
         let isAllFlipped = false;
+        let currentOpeningMode = 'regular'; // 'regular' or 'hits'
 
         const COMMONS = ["Pidgey", "Rattata", "Caterpie", "Weedle", "Metapod", "Kakuna", "Spearow", "Ekans", "Oddish", "Tentacool", "Zubat", "Geodude", "Magnemite"];
         const UNCOMMONS = ["Gloom", "Weepinbell", "Golbat", "Graveler", "Magneton", "Poliwhirl", "Haunter", "Kadabra", "Machoke"];
@@ -258,17 +292,22 @@
             if (sealedVault.length === 0) html = '<p style="font-size:13px; color:#888;">No sealed product in vault.</p>';
             sealedVault.forEach(item => {
                 html += `
-                    <div class="market-item">
-                        <div><strong>${item.name}</strong> <span class="tag tag-sealed">Sealed</span></div>
-                        <div>
-                            <button onclick="ripProduct(${item.id})">Rip Product ✂️</button>
+                    <div class="sealed-item">
+                        <div class="sealed-header">
+                            <strong>${item.name}</strong> 
+                            <span class="tag tag-sealed">${item.packs} Pack(s)</span>
+                        </div>
+                        <div class="sealed-buttons">
+                            <button onclick="ripProduct(${item.id}, 'regular')">Rip Pack ✂️</button>
+                            <button onclick="ripProduct(${item.id}, 'hits')" style="background:#ff9800; color:#fff;">Hits Only Stack 🔥</button>
+                            <button onclick="ripProduct(${item.id}, 'open_all')" style="background:#2196F3; color:#fff;">Open All ⚡</button>
                         </div>
                     </div>`;
             });
             document.getElementById('sealedInventory').innerHTML = html;
         }
 
-        function ripProduct(id) {
+        function ripProduct(id, mode) {
             let index = sealedVault.findIndex(item => item.id === id);
             if (index === -1) return;
             let item = sealedVault.splice(index, 1)[0];
@@ -279,8 +318,17 @@
                 totalPacks: item.packs
             };
 
+            currentOpeningMode = mode;
             document.getElementById('packRipArea').style.display = 'block';
-            setupNextPack();
+            document.getElementById('openAllResults').style.display = 'none';
+
+            if (mode === 'open_all') {
+                executeOpenAll();
+            } else if (mode === 'hits') {
+                setupHitsOnlyStack();
+            } else {
+                setupNextPack();
+            }
             updateUI();
         }
 
@@ -297,7 +345,70 @@
             document.getElementById('cardStack').innerHTML = '';
             document.getElementById('packControls').style.display = 'none';
             document.getElementById('packInstruction').style.display = 'none';
-            document.getElementById('packStageTitle').innerText = `Ready to Rip ${activeProduct.name}!`;
+            document.getElementById('packStageTitle').innerText = `Ready to Rip Next Pack (${activeProduct.totalPacks - activeProduct.packsLeft + 1} of ${activeProduct.totalPacks})!`;
+        }
+
+        function setupHitsOnlyStack() {
+            // Generate all packs at once, extract slots 8, 9, 10 from each pack
+            currentPackCards = [];
+            for (let i = 0; i < activeProduct.totalPacks; i++) {
+                let fullPack = generateSinglePack();
+                // 7th, 8th, and 9th zero-indexed cards correspond to slots 8, 9, 10
+                currentPackCards.push(fullPack[7], fullPack[8], fullPack[9]);
+            }
+
+            activeProduct.packsLeft = 0; // Consumption happens in one combined stack
+            currentCardIndex = 0;
+            isAllFlipped = false;
+
+            document.getElementById('packGraphic').style.display = 'flex';
+            document.getElementById('packGraphic').classList.remove('ripping');
+            document.getElementById('packGraphicLabel').innerText = `${activeProduct.name}\n🔥 Hits Only Stack (${currentPackCards.length} Cards)`;
+
+            document.getElementById('cardStack').style.display = 'none';
+            document.getElementById('cardStack').innerHTML = '';
+            document.getElementById('packControls').style.display = 'none';
+            document.getElementById('packInstruction').style.display = 'none';
+            document.getElementById('packStageTitle').innerText = `Ready to Rip Hits-Only Stack!`;
+        }
+
+        function executeOpenAll() {
+            document.getElementById('packGraphic').style.display = 'none';
+            document.getElementById('cardStack').style.display = 'none';
+            document.getElementById('packControls').style.display = 'block';
+            document.getElementById('packInstruction').style.display = 'none';
+
+            let allPulledCards = [];
+            let html = '';
+
+            for (let i = 0; i < activeProduct.totalPacks; i++) {
+                let pack = generateSinglePack();
+                allPulledCards.push(...pack);
+            }
+
+            // Save directly to inventory
+            allPulledCards.forEach(c => inventory.push(c));
+            updateUI();
+
+            allPulledCards.forEach(card => {
+                let isHit = (card.tier === 'Chase' || card.tier === 'HeavyHit' || card.tier === 'Filler');
+                html += `
+                    <div class="open-all-card ${isHit ? 'is-hit' : ''}">
+                        <strong style="color: ${isHit ? '#ffd700' : '#fff'}">${card.name}</strong>
+                        <div style="font-size: 10px; color: #aaa;">${card.tier}</div>
+                        <div style="font-size: 11px; color: #4CAF50; margin-top: 4px;">$${card.baseValue.toFixed(2)}</div>
+                    </div>`;
+            });
+
+            let resultsArea = document.getElementById('openAllResults');
+            resultsArea.innerHTML = html;
+            resultsArea.style.display = 'grid';
+
+            document.getElementById('packStageTitle').innerText = `⚡ ${activeProduct.totalPacks} Pack(s) Opened Instantly! (${allPulledCards.length} Cards Total)`;
+            document.getElementById('actionBtn').innerText = "Done / Close";
+            document.getElementById('actionBtn').onclick = () => {
+                document.getElementById('packRipArea').style.display = 'none';
+            };
         }
 
         function generateSinglePack() {
@@ -310,7 +421,7 @@
                 let name = UNCOMMONS[Math.floor(Math.random() * UNCOMMONS.length)];
                 pack.push(createCard(name, 'Uncommon', 1.50));
             }
-            pack.push(createCard("Reverse Holo " + COMMONS[0], 'Rare', 3.00));
+            pack.push(createCard("Reverse Holo " + COMMONS[Math.floor(Math.random() * COMMONS.length)], 'Rare', 3.00));
             pack.push(rollHitSlot());
             pack.push(rollHitSlot());
             return pack;
@@ -347,8 +458,6 @@
             let packG = document.getElementById('packGraphic');
             packG.classList.add('ripping');
 
-            activeProduct.packsLeft--;
-
             setTimeout(() => {
                 packG.style.display = 'none';
                 renderPhysicalCardStack();
@@ -361,13 +470,16 @@
             stackContainer.innerHTML = '';
             document.getElementById('packControls').style.display = 'block';
             document.getElementById('packInstruction').style.display = 'block';
-            document.getElementById('packInstruction').innerText = 'All 10 cards are stacked facedown! Click "Flip Cards" to flip them together.';
-            document.getElementById('packStageTitle').innerText = `Opened Pack (${activeProduct.totalPacks - activeProduct.packsLeft}/${activeProduct.totalPacks}) - Stacked Facedown`;
+            document.getElementById('packInstruction').innerText = `All ${currentPackCards.length} cards are stacked facedown! Click "Flip Cards" to flip them together.`;
+            document.getElementById('packStageTitle').innerText = currentOpeningMode === 'hits' 
+                ? `🔥 Hits Only Stack (${currentPackCards.length} Total Cards)`
+                : `Ripping Pack (${activeProduct.totalPacks - activeProduct.packsLeft} of ${activeProduct.totalPacks})`;
 
             activeCardElements = [];
             currentCardIndex = 0;
             isAllFlipped = false;
             document.getElementById('actionBtn').innerText = "Flip Cards 🔄";
+            document.getElementById('actionBtn').onclick = handleActionButton;
 
             currentPackCards.forEach((card, idx) => {
                 let cardEl = document.createElement('div');
@@ -394,7 +506,6 @@
 
         function handleActionButton() {
             if (!isAllFlipped) {
-                // Flip all together
                 isAllFlipped = true;
                 currentPackCards.forEach(c => inventory.push(c));
                 updateUI();
@@ -404,7 +515,7 @@
                 });
 
                 document.getElementById('packControls').style.display = 'none';
-                document.getElementById('packStageTitle').innerText = `Card 1 of 10 Revealed! Click top card to slide UP.`;
+                document.getElementById('packStageTitle').innerText = `Card 1 of ${currentPackCards.length} Revealed! Click top card to slide UP.`;
                 document.getElementById('packInstruction').innerText = 'Click the top card to slide it UP and reveal the next card underneath!';
             }
         }
@@ -422,9 +533,14 @@
             currentCardIndex++;
 
             if (currentCardIndex < currentPackCards.length) {
-                document.getElementById('packStageTitle').innerText = `Card ${currentCardIndex + 1} of 10 Revealed! Click to slide UP.`;
+                document.getElementById('packStageTitle').innerText = `Card ${currentCardIndex + 1} of ${currentPackCards.length} Revealed! Click to slide UP.`;
             } else {
-                // Pack complete! Check if product has more packs remaining
+                if (currentOpeningMode === 'regular') {
+                    activeProduct.packsLeft--;
+                } else {
+                    activeProduct.packsLeft = 0;
+                }
+
                 if (activeProduct.packsLeft > 0) {
                     document.getElementById('packStageTitle').innerText = `🎉 Pack Finished! ${activeProduct.packsLeft} pack(s) remaining in ${activeProduct.name}.`;
                     document.getElementById('packControls').style.display = 'block';
@@ -432,7 +548,7 @@
                     document.getElementById('actionBtn').onclick = setupNextPack;
                     document.getElementById('packInstruction').style.display = 'none';
                 } else {
-                    document.getElementById('packStageTitle').innerText = "🎉 All Packs in Product Opened & Added to Inventory!";
+                    document.getElementById('packStageTitle').innerText = "🎉 All Cards Claimed & Added to Inventory!";
                     document.getElementById('packInstruction').innerText = "Product fully opened!";
                     document.getElementById('packControls').style.display = 'block';
                     document.getElementById('actionBtn').innerText = "Done / Close";
