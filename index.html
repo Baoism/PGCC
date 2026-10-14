@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TCG Sourcing & Market Simulator</title>
+    <title>PCGC: Pokemon Card Grading Simulator</title>
     <style>
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background: #121214; color: #f0f0f0; margin: 0; padding: 20px; }
@@ -46,7 +46,6 @@
 
         .pack-rip-area { text-align: center; background: #18181c; padding: 20px; border-radius: 10px; border: 2px dashed #444; margin-top: 15px; position: relative; min-height: 520px; overflow: hidden; display: flex; flex-direction: column; align-items: center; }
         
-        /* BOOSTER PACK GRAPHIC */
         .pack-wrapper {
             width: 180px; height: 280px; background: linear-gradient(135deg, #e63946, #b7094c);
             margin: 20px auto; border-radius: 12px; border: 3px solid #ffb703;
@@ -63,7 +62,6 @@
             100% { transform: scale(0.2) rotate(20deg); opacity: 0; }
         }
 
-        /* ETB BOX GRAPHIC & ANIMATION */
         .etb-wrapper {
             width: 260px; height: 180px; background: linear-gradient(135deg, #2b2d42, #8d99ae);
             margin: 40px auto; border-radius: 10px; border: 3px solid #7209b7;
@@ -80,7 +78,6 @@
             100% { transform: translateY(-150px) scale(0.1); opacity: 0; }
         }
 
-        /* BOOSTER BOX GRAPHIC & ANIMATION */
         .box-wrapper {
             width: 280px; height: 220px; background: linear-gradient(135deg, #3a0ca3, #4361ee);
             margin: 30px auto; border-radius: 10px; border: 4px solid #4cc9f0;
@@ -189,8 +186,8 @@
 
     <div class="header">
         <div>
-            <h1>TCG Sourcing & Market Simulator</h1>
-            <div style="font-size: 12px; color: #4CAF50;">✨ ETB & Booster Box Opening Modules Active</div>
+            <h1>PCGC: Pokemon Card Grading Simulator</h1>
+            <div style="font-size: 12px; color: #4CAF50;">✨ Active & Stable Engine</div>
         </div>
         <div>
             <div class="cash">Cash: $<span id="cash">300.00</span></div>
@@ -199,7 +196,6 @@
     </div>
 
     <div class="grid">
-        <!-- Shop / Sourcing -->
         <div>
             <div class="card-panel">
                 <h2>🏪 1. The Shop (Sourcing)</h2>
@@ -213,19 +209,16 @@
                 <div id="packRipArea" class="pack-rip-area" style="display:none;">
                     <h3 id="packStageTitle">Click Sealed Item to Open!</h3>
                     
-                    <!-- Standard Booster Graphic -->
                     <div id="packGraphic" class="pack-wrapper" onclick="startRipAnimation()">
                         <span id="packGraphicLabel">BOOSTER PACK</span><br><span style="font-size:12px;">(Click to Rip ✂️)</span>
                     </div>
 
-                    <!-- ETB Graphic -->
                     <div id="etbGraphic" class="etb-wrapper" style="display:none;" onclick="startRipAnimation()">
                         <div style="font-size: 18px;">🎁 ELITE TRAINER BOX</div>
                         <div style="font-size: 12px; color: #f72585; margin-top: 6px;">Contains 8 Booster Packs</div>
                         <div style="font-size: 11px; color: #aaa; margin-top: 12px;">(Click to Lift Box Lid 📦)</div>
                     </div>
 
-                    <!-- Booster Box Graphic -->
                     <div id="boosterBoxGraphic" class="box-wrapper" style="display:none;" onclick="startRipAnimation()">
                         <div style="font-size: 20px;">📦 BOOSTER BOX</div>
                         <div style="font-size: 13px; color: #4cc9f0; margin-top: 6px;">36 Packs Sealed Display</div>
@@ -249,7 +242,6 @@
             </div>
         </div>
 
-        <!-- Portfolio & Grading -->
         <div>
             <div class="card-panel">
                 <div class="vault-header">
@@ -287,42 +279,11 @@
         let currentOpeningMode = 'regular';
 
         const COMMONS = [
-            "Pidgey (Gen 1)", "Rattata (Gen 1)", "Caterpie (Gen 1)", "Weedle (Gen 1)", "Metapod (Gen 1)", "Kakuna (Gen 1)", "Spearow (Gen 1)", "Ekans (Gen 1)", "Oddish (Gen 1)", "Gloom (Gen 1)", "Bellsprout (Gen 1)", "Weepinbell (Gen 1)", "Paras (Gen 1)", "Venonat (Gen 1)", "Exeggcute (Gen 1)", "Tangela (Gen 1)",
-            "Hoothoot (Gen 2)", "Noctowl (Gen 2)", "Ledyba (Gen 2)", "Ledian (Gen 2)", "Spinarak (Gen 2)", "Ariados (Gen 2)", "Sunkern (Gen 2)", "Pineco (Gen 2)",
-            "Wurmple (Gen 3)", "Silcoon (Gen 3)", "Cascoon (Gen 3)", "Seedot (Gen 3)", "Nuzleaf (Gen 3)", "Shroomish (Gen 3)", "Slakoth (Gen 3)", "Vigoroth (Gen 3)", "Nincada (Gen 3)",
-            "Kricketot (Gen 4)", "Cherubi (Gen 4)", "Buneary (Gen 4)",
-            "Patrat (Gen 5)", "Watchog (Gen 5)", "Sewaddle (Gen 5)", "Swadloon (Gen 5)", "Foongus (Gen 5)",
-            "Bunnelby (Gen 6)", "Fletchling (Gen 6)", "Fletchinder (Gen 6)",
-            "Yungoos (Gen 7)", "Gumshoos (Gen 7)",
-            "Skwovet (Gen 8)", "Greedent (Gen 8)",
-            "Tarountula (Gen 9)", "Nymble (Gen 9)",
-            "Tentacool (Gen 1)", "Psyduck (Gen 1)", "Poliwag (Gen 1)", "Poliwhirl (Gen 1)", "Krabby (Gen 1)", "Horsea (Gen 1)", "Seadra (Gen 1)", "Goldeen (Gen 1)", "Seaking (Gen 1)", "Staryu (Gen 1)", "Magikarp (Gen 1)", "Shellder (Gen 1)",
-            "Marill (Gen 2)", "Azumarill (Gen 2)", "Wooper (Gen 2)", "Quagsire (Gen 2)", "Remoraid (Gen 2)", "Octillery (Gen 2)", "Mantine (Gen 2)", "Qwilfish (Gen 2)",
-            "Lotad (Gen 3)", "Lombre (Gen 3)", "Wingull (Gen 3)", "Pelipper (Gen 3)", "Carvanha (Gen 3)", "Wailmer (Gen 3)", "Barboach (Gen 3)", "Corphish (Gen 3)", "Luvdisc (Gen 3)", "Spheal (Gen 3)", "Sealeo (Gen 3)", "Clamperl (Gen 3)",
-            "Shellos (Gen 4)", "Gastrodon (Gen 4)", "Finneon (Gen 4)", "Lumineon (Gen 4)",
-            "Tympole (Gen 5)", "Palpitoad (Gen 5)", "Basculin (Gen 5)", "Alomomola (Gen 5)",
-            "Clauncher (Gen 6)", "Skrelp (Gen 6)",
-            "Wishiwashi (Gen 7)", "Mareanie (Gen 7)", "Pyukumuku (Gen 7)", "Bruxish (Gen 7)",
-            "Cramorant (Gen 8)", "Arrokuda (Gen 8)",
-            "Wiglett (Gen 9)", "Finizen (Gen 9)",
-            "Zubat (Gen 1)", "Golbat (Gen 1)", "Geodude (Gen 1)", "Graveler (Gen 1)", "Sandshrew (Gen 1)", "Diglett (Gen 1)", "Machop (Gen 1)", "Machoke (Gen 1)", "Mankey (Gen 1)", "Onix (Gen 1)", "Rhyhorn (Gen 1)", "Cubone (Gen 1)",
-            "Dunsparce (Gen 2)", "Slugma (Gen 2)", "Swinub (Gen 2)", "Piloswine (Gen 2)", "Phanpy (Gen 2)",
-            "Aron (Gen 3)", "Lairon (Gen 3)", "Numel (Gen 3)", "Camerupt (Gen 3)", "Torkoal (Gen 3)", "Trapinch (Gen 3)", "Cacnea (Gen 3)", "Baltoy (Gen 3)",
-            "Hippopotas (Gen 4)",
-            "Roggenrola (Gen 5)", "Boldore (Gen 5)", "Drilbur (Gen 5)", "Dwebble (Gen 5)", "Crustle (Gen 5)", "Sandile (Gen 5)", "Krokorok (Gen 5)", "Darumaka (Gen 5)", "Ferroseed (Gen 5)",
-            "Helioptile (Gen 6)",
-            "Mudbray (Gen 7)", "Mudsdale (Gen 7)", "Salandit (Gen 7)", "Minior (Gen 7)",
-            "Rolycoly (Gen 8)", "Carkol (Gen 8)", "Silicobra (Gen 8)",
-            "Nacli (Gen 9)", "Naclstack (Gen 9)", "Klawf (Gen 9)", "Orthworm (Gen 9)", "Glimmet (Gen 9)", "Toedscool (Gen 9)",
-            "Magnemite (Gen 1)", "Magneton (Gen 1)", "Voltorb (Gen 1)", "Grimer (Gen 1)", "Drowzee (Gen 1)", "Koffing (Gen 1)", "Gastly (Gen 1)", "Haunter (Gen 1)", "Porygon (Gen 1)",
-            "Natu (Gen 2)", "Mareep (Gen 2)", "Flaaffy (Gen 2)", "Unown (Gen 2)", "Snubbull (Gen 2)",
-            "Ralts (Gen 3)", "Kirlia (Gen 3)", "Whismur (Gen 3)", "Loudred (Gen 3)", "Electrike (Gen 3)", "Shuppet (Gen 3)", "Duskull (Gen 3)", "Chimecho (Gen 3)",
-            "Shinx (Gen 4)", "Luxio (Gen 4)", "Drifloon (Gen 4)", "Chingling (Gen 4)",
-            "Purrloin (Gen 5)", "Blitzle (Gen 5)", "Woobat (Gen 5)", "Trubbish (Gen 5)", "Gothita (Gen 5)", "Gothorita (Gen 5)", "Solosis (Gen 5)", "Duosion (Gen 5)", "Elgyem (Gen 5)", "Litwick (Gen 5)", "Lampent (Gen 5)",
-            "Honedge (Gen 6)", "Doublade (Gen 6)", "Klefki (Gen 6)", "Phantump (Gen 6)", "Pumpkaboo (Gen 6)",
-            "Grubbin (Gen 7)", "Charjabug (Gen 7)", "Togedemaru (Gen 7)",
-            "Sinistea (Gen 8)", "Milcery (Gen 8)",
-            "Pawmi (Gen 9)", "Pawmo (Gen 9)", "Maschiff (Gen 9)"
+            "Pidgey (Gen 1)", "Rattata (Gen 1)", "Caterpie (Gen 1)", "Weedle (Gen 1)", "Metapod (Gen 1)", 
+            "Hoothoot (Gen 2)", "Noctowl (Gen 2)", "Ledyba (Gen 2)", "Spinarak (Gen 2)", "Ariados (Gen 2)",
+            "Wurmple (Gen 3)", "Seedot (Gen 3)", "Shroomish (Gen 3)", "Slakoth (Gen 3)", "Nincada (Gen 3)",
+            "Kricketot (Gen 4)", "Cherubi (Gen 4)", "Buneary (Gen 4)", "Patrat (Gen 5)", "Sewaddle (Gen 5)",
+            "Bunnelby (Gen 6)", "Fletchling (Gen 6)", "Yungoos (Gen 7)", "Skwovet (Gen 8)", "Tarountula (Gen 9)"
         ];
 
         const TIER_1_BULK_LIST = [
@@ -346,5 +307,565 @@
             { name: "Watchog (Gen 5) — (Standard Holo)", val: 1.50 },
             { name: "Diggersby (Gen 6) — (Standard Holo)", val: 1.50 },
             { name: "Gumshoos (Gen 7) — (GX)", val: 2.50 },
-            { name: "Blipbug (Gen 8) — (Standard H   olo)", val: 1.50 },
-            { name: "Lechonk (Gen 9) — (
+            { name: "Blipbug (Gen 8) — (Standard Holo)", val: 1.50 },
+            { name: "Lechonk (Gen 9) — (Illustration Rare)", val: 5.00 }
+        ];
+
+        const TIER_2_FILLER_LIST = [
+            { name: "Chikorita (Gen 2) — (Illustration Rare)", val: 12.00 },
+            { name: "Cyndaquil (Gen 2) — (Illustration Rare)", val: 15.00 },
+            { name: "Totodile (Gen 2) — (Illustration Rare)", val: 14.00 },
+            { name: "Treecko (Gen 3) — (Standard Holo)", val: 6.00 },
+            { name: "Torchic (Gen 3) — (Standard Holo)", val: 6.00 },
+            { name: "Mudkip (Gen 3) — (Standard Holo)", val: 8.00 },
+            { name: "Mareep (Gen 2) — (GG Art Holo)", val: 9.00 },
+            { name: "Wooper (Gen 2) — (Shiny Vault, ex)", val: 10.00 },
+            { name: "Marill (Gen 2) — (Illustration Rare)", val: 12.00 },
+            { name: "Psyduck (Gen 1) — (Illustration Rare)", val: 18.00 },
+            { name: "Growlithe (Gen 1) — (Illustration Rare)", val: 16.00 },
+            { name: "Riolu (Gen 4) — (Shiny Vault, Illustration Rare)", val: 14.00 }
+        ];
+
+        const TIER_3_HEAVY_LIST = [
+            { name: "Gengar (Gen 1) — (GX, VMAX, Regular ex)", val: 45.00 },
+            { name: "Alakazam (Gen 1) — (Gold Star, LX, ex)", val: 55.00 },
+            { name: "Machamp (Gen 1) — (GX, VMAX, ex)", val: 35.00 },
+            { name: "Gyarados (Gen 1) — (GX, VMAX, Tera ex)", val: 50.00 },
+            { name: "Lapras (Gen 1) — (VMAX, ex, Tera ex)", val: 30.00 },
+            { name: "Snorlax (Gen 1) — (VMAX, Secret Rare)", val: 60.00 },
+            { name: "Dragonite (Gen 1) — (GX, VSTAR, ex)", val: 65.00 },
+            { name: "Tyranitar (Gen 2) — (GX, VMAX, Tera ex)", val: 55.00 },
+            { name: "Gardevoir (Gen 3) — (GX, VMAX, ex)", val: 60.00 },
+            { name: "Lucario (Gen 4) — (GX, VSTAR, ex)", val: 50.00 },
+            { name: "Greninja (Gen 6) — (GX, Tera ex / Modern Grail)", val: 85.00 },
+            { name: "Sylveon (Gen 6) — (GX, VMAX / Alt Art)", val: 75.00 }
+        ];
+
+        const TIER_4_CHASE_STANDARD = [
+            { name: "Vaporeon (Gen 1) — (VMAX / Premium Promo)", val: 120.00 },
+            { name: "Jolteon (Gen 1) — (VMAX / Premium Promo)", val: 120.00 },
+            { name: "Flareon (Gen 1) — (VMAX / Premium Promo)", val: 120.00 },
+            { name: "Roaring Moon (Gen 9) — (Ancient ex SIR)", val: 180.00 },
+            { name: "Giratina (Gen 4) — (GX, VSTAR / Alt Art)", val: 200.00 },
+            { name: "Arceus (Gen 4) — (LV.X, GX / Gold Secret)", val: 160.00 },
+            { name: "Mewtwo (Gen 1) — (Gold Star, GX, ex)", val: 220.00 },
+            { name: "Mew (Gen 1) — (Gold Star, VMAX, Tera ex)", val: 250.00 },
+            { name: "Lugia (Gen 2) — (LEGEND, VSTAR / Alt Art)", val: 350.00 }
+        ];
+
+        const TAG_TEAM_LIST = [
+            "Mewtwo & Mew GX", "Pikachu & Zekrom GX", "Blastoise & Piplup GX", 
+            "Reshiram & Charizard GX", "Gengar & Mimikyu GX", "Umbreon & Darkrai GX"
+        ];
+
+        const PRODUCTS = [
+            { id: 'booster', name: 'Booster Pack', price: 10, packs: 1, sentiment: '+1.2%' },
+            { id: 'blister', name: '3-Pack Blister', price: 30, packs: 3, sentiment: '+2.5%' },
+            { id: 'etb', name: 'Elite Trainer Box (ETB)', price: 80, packs: 8, sentiment: '+4.2%' },
+            { id: 'box', name: 'Booster Box (36 Packs)', price: 320, packs: 36, sentiment: '+0.8%' }
+        ];
+
+        const RARITY_RANK = { 'Chase': 6, 'HeavyHit': 5, 'Filler': 4, 'Bulk': 3, 'Rare': 2, 'Uncommon': 1, 'Common': 0 };
+
+        function updateUI() {
+            document.getElementById('cash').innerText = cash.toFixed(2);
+            let cardValue = inventory.reduce((acc, card) => acc + getItemMarketValue(card), 0);
+            let sealedValue = sealedVault.reduce((acc, item) => acc + item.price, 0);
+            document.getElementById('netWorth').innerText = (cash + cardValue + sealedValue).toFixed(2);
+
+            renderShop();
+            renderSealed();
+            renderInventory();
+        }
+
+        function getItemMarketValue(card) {
+            let base = card.baseValue;
+            if (card.state === 'Graded') {
+                return base * getGradedMultiplier(card.gradingInfo.finalGrade, card.gradingInfo.isBlackLabel);
+            }
+            return base;
+        }
+
+        function getGradedMultiplier(grade, isBlackLabel) {
+            if (isBlackLabel) return 25.0;
+            if (grade === 10) return 4.5;
+            if (grade === 9.5) return 2.2;
+            if (grade === 9.0) return 1.4;
+            if (grade === 8.5) return 0.85;
+            if (grade <= 8.0) return 0.50;
+            return 0.5;
+        }
+
+        function getGradingFee(rawVal) {
+            if (rawVal >= 300) return 200;
+            if (rawVal >= 100) return 85;
+            if (rawVal >= 25) return 45;
+            return 20;
+        }
+
+        function renderShop() {
+            let html = '';
+            PRODUCTS.forEach(p => {
+                html += `
+                    <div class="market-item">
+                        <div>
+                            <strong>${p.name}</strong> <span class="badge">${p.sentiment}</span>
+                            <div style="font-size:12px; color:#aaa;">Contains ${p.packs} Pack(s)</div>
+                        </div>
+                        <div>
+                            <button onclick="buyProduct('${p.id}')">Buy $${p.price}</button>
+                        </div>
+                    </div>`;
+            });
+            document.getElementById('shopList').innerHTML = html;
+        }
+
+        function buyProduct(prodId) {
+            let p = PRODUCTS.find(prod => prod.id === prodId);
+            if (cash < p.price) { alert("Not enough cash!"); return; }
+            cash -= p.price;
+            sealedVault.push({ ...p, id: Date.now() + Math.random() });
+            updateUI();
+        }
+
+        function renderSealed() {
+            let html = '';
+            if (sealedVault.length === 0) html = '<p style="font-size:13px; color:#888;">No sealed product in vault.</p>';
+            sealedVault.forEach(item => {
+                html += `
+                    <div class="sealed-item">
+                        <div class="sealed-header">
+                            <strong>${item.name}</strong> 
+                            <span class="tag tag-sealed">${item.packs} Pack(s)</span>
+                        </div>
+                        <div class="sealed-buttons">
+                            <button onclick="ripProduct(${item.id}, 'regular')">Rip Product ✂️</button>
+                            <button onclick="ripProduct(${item.id}, 'hits')" style="background:#ff9800; color:#fff;">Hits Only Stack 🔥</button>
+                            <button onclick="ripProduct(${item.id}, 'open_all')" style="background:#2196F3; color:#fff;">Open All ⚡</button>
+                        </div>
+                    </div>`;
+            });
+            document.getElementById('sealedInventory').innerHTML = html;
+        }
+
+        function ripProduct(id, mode) {
+            let index = sealedVault.findIndex(item => item.id === id);
+            if (index === -1) return;
+            let item = sealedVault.splice(index, 1)[0];
+            
+            activeProduct = {
+                name: item.name,
+                prodId: item.id,
+                packsLeft: item.packs,
+                totalPacks: item.packs
+            };
+
+            currentOpeningMode = mode;
+            document.getElementById('packRipArea').style.display = 'flex';
+            document.getElementById('openAllResults').style.display = 'none';
+
+            if (mode === 'open_all') {
+                executeOpenAll();
+            } else if (mode === 'hits') {
+                setupHitsOnlyStack();
+            } else {
+                setupNextPack();
+            }
+            updateUI();
+        }
+
+        function setupNextPack() {
+            currentPackCards = generateSinglePack();
+            currentCardIndex = 0;
+            isAllFlipped = false;
+
+            document.getElementById('packGraphic').style.display = 'none';
+            document.getElementById('etbGraphic').style.display = 'none';
+            document.getElementById('boosterBoxGraphic').style.display = 'none';
+
+            if (activeProduct.totalPacks === 8) {
+                let etbG = document.getElementById('etbGraphic');
+                etbG.style.display = 'flex';
+                etbG.classList.remove('opening');
+            } else if (activeProduct.totalPacks === 36) {
+                let boxG = document.getElementById('boosterBoxGraphic');
+                boxG.style.display = 'flex';
+                boxG.classList.remove('opening');
+            } else {
+                let packG = document.getElementById('packGraphic');
+                packG.style.display = 'flex';
+                packG.classList.remove('ripping');
+                document.getElementById('packGraphicLabel').innerText = `${activeProduct.name}\n(${activeProduct.packsLeft} Pack(s) Remaining)`;
+            }
+            
+            document.getElementById('cardStack').style.display = 'none';
+            document.getElementById('cardStack').innerHTML = '';
+            document.getElementById('packControls').style.display = 'none';
+            document.getElementById('packInstruction').style.display = 'none';
+            document.getElementById('packStageTitle').innerText = `Ready to Open ${activeProduct.name} (${activeProduct.totalPacks - activeProduct.packsLeft + 1} of ${activeProduct.totalPacks})!`;
+        }
+
+        function setupHitsOnlyStack() {
+            currentPackCards = [];
+            let autoBulkCards = [];
+
+            for (let i = 0; i < activeProduct.totalPacks; i++) {
+                let fullPack = generateSinglePack();
+                autoBulkCards.push(...fullPack.slice(0, 7));
+                currentPackCards.push(fullPack[7], fullPack[8], fullPack[9]);
+            }
+
+            autoBulkCards.forEach(c => inventory.push(c));
+
+            activeProduct.packsLeft = 0;
+            currentCardIndex = 0;
+            isAllFlipped = false;
+
+            document.getElementById('packGraphic').style.display = 'none';
+            document.getElementById('etbGraphic').style.display = 'none';
+            document.getElementById('boosterBoxGraphic').style.display = 'none';
+
+            if (activeProduct.totalPacks === 8) {
+                document.getElementById('etbGraphic').style.display = 'flex';
+            } else if (activeProduct.totalPacks === 36) {
+                document.getElementById('boosterBoxGraphic').style.display = 'flex';
+            } else {
+                document.getElementById('packGraphic').style.display = 'flex';
+            }
+
+            document.getElementById('cardStack').style.display = 'none';
+            document.getElementById('cardStack').innerHTML = '';
+            document.getElementById('packControls').style.display = 'none';
+            document.getElementById('packInstruction').style.display = 'none';
+            document.getElementById('packStageTitle').innerText = `Ready to Rip Hits-Only Stack! (${autoBulkCards.length} Bulk cards credited to vault)`;
+        }
+
+        function executeOpenAll() {
+            document.getElementById('packGraphic').style.display = 'none';
+            document.getElementById('etbGraphic').style.display = 'none';
+            document.getElementById('boosterBoxGraphic').style.display = 'none';
+            document.getElementById('cardStack').style.display = 'none';
+            document.getElementById('packControls').style.display = 'block';
+            document.getElementById('packInstruction').style.display = 'none';
+
+            let allPulledCards = [];
+            let html = '';
+
+            for (let i = 0; i < activeProduct.totalPacks; i++) {
+                let pack = generateSinglePack();
+                allPulledCards.push(...pack);
+            }
+
+            allPulledCards.forEach(c => inventory.push(c));
+            updateUI();
+
+            allPulledCards.forEach(card => {
+                let isHit = (card.tier === 'Chase' || card.tier === 'HeavyHit' || card.tier === 'Filler');
+                html += `
+                    <div class="open-all-card ${isHit ? 'is-hit' : ''}">
+                        <strong style="color: ${isHit ? '#ffd700' : '#fff'}">${card.name}</strong>
+                        <div style="font-size: 10px; color: #aaa;">${card.tier}</div>
+                        <div style="font-size: 11px; color: #4CAF50; margin-top: 4px;">$${card.baseValue.toFixed(2)}</div>
+                    </div>`;
+            });
+
+            let resultsArea = document.getElementById('openAllResults');
+            resultsArea.innerHTML = html;
+            resultsArea.style.display = 'grid';
+
+            document.getElementById('packStageTitle').innerText = `⚡ ${activeProduct.totalPacks} Pack(s) Opened Instantly! (${allPulledCards.length} Cards Total)`;
+            document.getElementById('actionBtn').innerText = "Done / Close";
+            document.getElementById('actionBtn').onclick = () => {
+                document.getElementById('packRipArea').style.display = 'none';
+            };
+        }
+
+        function generateSinglePack() {
+            let pack = [];
+            for (let i = 0; i < 4; i++) {
+                let name = COMMONS[Math.floor(Math.random() * COMMONS.length)];
+                pack.push(createCard(name, 'Common', 0.50));
+            }
+            for (let i = 0; i < 3; i++) {
+                let name = COMMONS[Math.floor(Math.random() * COMMONS.length)];
+                pack.push(createCard(name, 'Uncommon', 1.50));
+            }
+            let revHoloName = COMMONS[Math.floor(Math.random() * COMMONS.length)];
+            pack.push(createCard("Reverse Holo " + revHoloName, 'Rare', 3.00));
+            
+            pack.push(rollHitSlot());
+            pack.push(rollHitSlot());
+            return pack;
+        }
+
+        function rollHitSlot() {
+            let roll = Math.random() * 100;
+
+            if (roll <= 5.0) {
+                let subRoll = Math.random() * 100;
+
+                if (subRoll <= 1.0) {
+                    return createCard("Umbreon (Gen 2) — (Gold Star, 'Moonbreon' Alternate Art)", 'Chase', 850.00);
+                } else if (subRoll <= 3.0) {
+                    return createCard("Charizard (Gen 1) — (Base Set Holographic, GX, VMAX, Tera ex)", 'Chase', 500.00);
+                } else if (subRoll <= 5.0) {
+                    return createCard("Pikachu (Gen 1) — (VMAX, VSTAR, Stellar Tera ex)", 'Chase', 350.00);
+                } else if (subRoll <= 7.0) {
+                    return createCard("Rayquaza (Gen 3) — (Gold Star, GX, VMAX / Alternate Art)", 'Chase', 400.00);
+                } else if (subRoll <= 17.0) {
+                    let tagCard = TAG_TEAM_LIST[Math.floor(Math.random() * TAG_TEAM_LIST.length)];
+                    return createCard(`Tag Team — (${tagCard})`, 'Chase', 280.00);
+                } else {
+                    let item = TIER_4_CHASE_STANDARD[Math.floor(Math.random() * TIER_4_CHASE_STANDARD.length)];
+                    return createCard(item.name, 'Chase', item.val);
+                }
+            } else if (roll <= 20.0) {
+                let item = TIER_3_HEAVY_LIST[Math.floor(Math.random() * TIER_3_HEAVY_LIST.length)];
+                return createCard(item.name, 'HeavyHit', item.val);
+            } else if (roll <= 50.0) {
+                let item = TIER_2_FILLER_LIST[Math.floor(Math.random() * TIER_2_FILLER_LIST.length)];
+                return createCard(item.name, 'Filler', item.val);
+            } else {
+                let item = TIER_1_BULK_LIST[Math.floor(Math.random() * TIER_1_BULK_LIST.length)];
+                return createCard(item.name, 'Bulk', item.val);
+            }
+        }
+
+        function createCard(name, tier, baseVal) {
+            return {
+                id: Date.now() + Math.random(),
+                name: name,
+                tier: tier,
+                baseValue: baseVal,
+                state: 'Raw'
+            };
+        }
+
+        function startRipAnimation() {
+            let activeGraphic = null;
+
+            if (activeProduct.totalPacks === 8) {
+                activeGraphic = document.getElementById('etbGraphic');
+                activeGraphic.classList.add('opening');
+            } else if (activeProduct.totalPacks === 36) {
+                activeGraphic = document.getElementById('boosterBoxGraphic');
+                activeGraphic.classList.add('opening');
+            } else {
+                activeGraphic = document.getElementById('packGraphic');
+                activeGraphic.classList.add('ripping');
+            }
+
+            setTimeout(() => {
+                if (activeGraphic) activeGraphic.style.display = 'none';
+                renderPhysicalCardStack();
+            }, 650);
+        }
+
+        function renderPhysicalCardStack() {
+            let stackContainer = document.getElementById('cardStack');
+            stackContainer.style.display = 'block';
+            stackContainer.innerHTML = '';
+            document.getElementById('packControls').style.display = 'block';
+            document.getElementById('packInstruction').style.display = 'block';
+            document.getElementById('packInstruction').innerText = `All ${currentPackCards.length} cards are stacked facedown! Click "Flip Cards" to flip them together.`;
+            document.getElementById('packStageTitle').innerText = currentOpeningMode === 'hits' 
+                ? `🔥 Hits Only Stack (${currentPackCards.length} Total Cards)`
+                : `Ripping Pack (${activeProduct.totalPacks - activeProduct.packsLeft} of ${activeProduct.totalPacks})`;
+
+            activeCardElements = [];
+            currentCardIndex = 0;
+            isAllFlipped = false;
+            document.getElementById('actionBtn').innerText = "Flip Cards 🔄";
+            document.getElementById('actionBtn').onclick = handleActionButton;
+
+            currentPackCards.forEach((card, idx) => {
+                let cardEl = document.createElement('div');
+                cardEl.className = 'physical-card';
+                
+                let offset = Math.min(idx * 0.5, 20);
+                cardEl.style.top = `${offset}px`;
+                cardEl.style.left = `${offset * 0.5}px`;
+                cardEl.style.zIndex = currentPackCards.length - idx;
+
+                cardEl.innerHTML = `
+                    <div class="physical-card-inner">
+                        <div class="physical-card-back">TCG CARD</div>
+                        <div class="physical-card-front rarity-${card.tier}">
+                            <div style="font-size:11px; color:#aaa; text-transform:uppercase;">${card.tier}</div>
+                            <div style="font-size:13px; font-weight:bold; margin:8px 0; text-align:center;">${card.name}</div>
+                            <div style="font-size:13px; color:#4CAF50;">$${card.baseValue.toFixed(2)}</div>
+                        </div>
+                    </div>`;
+
+                cardEl.onclick = () => handleTopCardClick(idx);
+                stackContainer.appendChild(cardEl);
+                activeCardElements.push({ el: cardEl, card: card });
+            });
+        }
+
+        function handleActionButton() {
+            if (!isAllFlipped) {
+                isAllFlipped = true;
+                currentPackCards.forEach(c => inventory.push(c));
+                updateUI();
+
+                activeCardElements.forEach(item => {
+                    item.el.classList.add('flipped-all');
+                });
+
+                document.getElementById('packControls').style.display = 'none';
+                document.getElementById('packStageTitle').innerText = `Card 1 of ${currentPackCards.length} Revealed! Click top card to slide UP.`;
+                document.getElementById('packInstruction').innerText = 'Click the top card to slide it UP and reveal the next card underneath!';
+            }
+        }
+
+        function handleTopCardClick(idx) {
+            if (!isAllFlipped) {
+                handleActionButton();
+                return;
+            }
+
+            if (idx !== currentCardIndex) return;
+
+            let cardData = activeCardElements[idx];
+            cardData.el.classList.add('slide-up');
+            currentCardIndex++;
+
+            if (currentCardIndex < currentPackCards.length) {
+                document.getElementById('packStageTitle').innerText = `Card ${currentCardIndex + 1} of ${currentPackCards.length} Revealed! Click to slide UP.`;
+            } else {
+                if (currentOpeningMode === 'regular') {
+                    activeProduct.packsLeft--;
+                } else {
+                    activeProduct.packsLeft = 0;
+                }
+
+                if (activeProduct.packsLeft > 0) {
+                    document.getElementById('packStageTitle').innerText = `🎉 Pack Finished! ${activeProduct.packsLeft} pack(s) remaining in ${activeProduct.name}.`;
+                    document.getElementById('packControls').style.display = 'block';
+                    document.getElementById('actionBtn').innerText = "Open Next Pack ➡️";
+                    document.getElementById('actionBtn').onclick = setupNextPack;
+                    document.getElementById('packInstruction').style.display = 'none';
+                } else {
+                    document.getElementById('packStageTitle').innerText = "🎉 All Cards Claimed & Added to Inventory!";
+                    document.getElementById('packInstruction').innerText = "Product fully opened!";
+                    document.getElementById('packControls').style.display = 'block';
+                    document.getElementById('actionBtn').innerText = "Done / Close";
+                    document.getElementById('actionBtn').onclick = () => {
+                        document.getElementById('packRipArea').style.display = 'none';
+                    };
+                }
+            }
+        }
+
+        function renderInventory() {
+            let sortMode = document.getElementById('sortSelect') ? document.getElementById('sortSelect').value : 'val-desc';
+            let html = '';
+
+            if (inventory.length === 0) {
+                document.getElementById('cardInventory').innerHTML = '<p style="font-size:13px; color:#888;">No cards in collection.</p>';
+                return;
+            }
+
+            let sortedCards = [...inventory];
+
+            sortedCards.sort((a, b) => {
+                let valA = getItemMarketValue(a);
+                let valB = getItemMarketValue(b);
+
+                if (sortMode === 'val-desc') return valB - valA;
+                if (sortMode === 'val-asc') return valA - valB;
+                if (sortMode === 'rarity') return (RARITY_RANK[b.tier] || 0) - (RARITY_RANK[a.tier] || 0);
+                if (sortMode === 'company') {
+                    let compA = a.state === 'Graded' ? a.gradingInfo.company : 'Z_Raw';
+                    let compB = b.state === 'Graded' ? b.gradingInfo.company : 'Z_Raw';
+                    return compA.localeCompare(compB);
+                }
+                return 0;
+            });
+
+            sortedCards.forEach(card => {
+                let val = getItemMarketValue(card);
+                let fee = getGradingFee(card.baseValue);
+                let stateTag = card.state === 'Graded' 
+                    ? `<span class="tag tag-graded">${card.gradingInfo.company} ${card.gradingInfo.finalGrade}${card.gradingInfo.isBlackLabel ? ' (BLACK LABEL)' : ''}</span>`
+                    : `<span class="tag tag-raw">Raw</span>`;
+
+                html += `
+                    <div class="card-item rarity-${card.tier}">
+                        <div>
+                            <strong>${card.name}</strong> ${stateTag}
+                            <div style="font-size:12px; color:#aaa;">Market Value: $${val.toFixed(2)}</div>
+                        </div>
+                        <div>
+                            ${card.state === 'Raw' ? `<button onclick="gradeCard('${card.id}')" style="font-size:11px;">Grade ($${fee})</button>` : ''}
+                            <button onclick="sellCard('${card.id}')" style="font-size:11px; background:#4CAF50; color:#fff;">Sell</button>
+                        </div>
+                    </div>`;
+            });
+
+            document.getElementById('cardInventory').innerHTML = html;
+        }
+
+        function sellCard(cardId) {
+            let idx = inventory.findIndex(c => c.id == cardId);
+            if (idx === -1) return;
+            let card = inventory[idx];
+            
+            let sellChance = card.state === 'Graded' ? 0.85 : 0.50;
+            if (Math.random() <= sellChance) {
+                cash += getItemMarketValue(card);
+                inventory.splice(idx, 1);
+                updateUI();
+            } else {
+                alert("No buyer found on marketplace right now. Try again!");
+            }
+        }
+
+        function gradeCard(cardId) {
+            let card = inventory.find(c => c.id == cardId);
+            if (!card) return;
+
+            let fee = getGradingFee(card.baseValue);
+            if (cash < fee) { 
+                alert(`Not enough cash! This card requires a $${fee} grading fee.`); 
+                return; 
+            }
+
+            let choice = prompt("Select Grading Company:\n1 - PSA\n2 - CGC\n3 - Beckett (BGS)", "1");
+            let company = 'PSA';
+            if (choice === '2') company = 'CGC';
+            if (choice === '3') company = 'Beckett';
+
+            cash -= fee;
+
+            let roll = Math.random() * 100;
+            let finalGrade = 10;
+
+            if (roll <= 30) {
+                finalGrade = 10.0;
+            } else if (roll <= 60) {
+                finalGrade = (company === 'Beckett' || company === 'CGC') ? 9.5 : 9.0;
+            } else if (roll <= 80) {
+                finalGrade = 8.5;
+            } else {
+                finalGrade = 8.0;
+            }
+
+            let isBlackLabel = (company === 'Beckett' && finalGrade === 10 && Math.random() <= 0.08);
+
+            card.state = 'Graded';
+            card.gradingInfo = {
+                company: company,
+                finalGrade: finalGrade,
+                isBlackLabel: isBlackLabel
+            };
+
+            updateUI();
+            alert(`🎉 Grading complete with ${company}! Result: ${company} ${finalGrade}${isBlackLabel ? ' (BLACK LABEL!)' : ''}`);
+        }
+
+        updateUI();
+    </script>
+</body>
+</html>
