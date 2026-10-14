@@ -247,7 +247,7 @@
     <div class="header">
         <div>
             <h1>PCGC: Pokemon Card Grading Simulator</h1>
-            <div style="font-size: 12px; color: #4CAF50;">✨ Real Market Valuations & Calibrated Balances</div>
+            <div style="font-size: 12px; color: #4CAF50;">✨ ETB Promo & Pokémon Center Stamp Update Active</div>
         </div>
         <div>
             <div class="cash">Cash: $<span id="cash">300.00</span></div>
@@ -275,7 +275,7 @@
 
                     <div id="etbGraphic" class="etb-wrapper" style="display:none;" onclick="startRipAnimation()">
                         <div style="font-size: 18px;">🎁 ELITE TRAINER BOX</div>
-                        <div style="font-size: 12px; color: #f72585; margin-top: 6px;">Contains 8 Booster Packs</div>
+                        <div style="font-size: 12px; color: #f72585; margin-top: 6px;">Contains 8 Booster Packs + Promo</div>
                         <div style="font-size: 11px; color: #aaa; margin-top: 12px;">(Click to Lift Box Lid 📦)</div>
                     </div>
 
@@ -389,7 +389,6 @@
             { rawString: "Riolu (Gen 4) — (Shiny Vault, Illustration Rare)", val: 14.00 }
         ];
 
-        // REAL MARKETPLACE BASED RANKED HEAVY HIT LIST
         const TIER_3_HEAVY_LIST = [
             { rawString: "Alakazam (Gen 1) — (Gold Star, ex, Lv.X)", val: 280.00, weight: 5 },
             { rawString: "Metagross (Gen 3) — (Gold Star, ex, GX)", val: 260.00, weight: 5 },
@@ -415,7 +414,6 @@
             { rawString: "Dragapult (Gen 8) — (VMAX, ex)", val: 15.00, weight: 18 }
         ];
 
-        // REAL MARKETPLACE BASED TIER 4 CHASE CARDS
         const TIER_4_CHASE_STANDARD = [
             { rawString: "Vaporeon (Gen 1) — (VMAX, Premium Promo)", val: 120.00 },
             { rawString: "Jolteon (Gen 1) — (VMAX, Premium Promo)", val: 120.00 },
@@ -431,7 +429,15 @@
 
         const TAG_TEAM_LIST = [
             "Mewtwo & Mew GX", "Pikachu & Zekrom GX", "Blastoise & Piplup GX", 
-            "Reshiram & Charizard GX", "Gengar & Mimikyu GX", "Umbreon & Darkrai GX"
+            "Reshiram & Charizard GX", "Gengar & Mimikyu GX"
+        ];
+
+        // ETB EXCLUSIVE PROMOS POOL (Umbreon/Darkrai & Espeon/Deoxys removed)
+        const ETB_PROMOS = [
+            { rawString: "Charizard Promo (Gen 1) — (Promo Holo)", val: 35.00 },
+            { rawString: "Pikachu Promo (Gen 1) — (Promo Holo)", val: 30.00 },
+            { rawString: "Lucario Promo (Gen 4) — (Promo Holo)", val: 20.00 },
+            { rawString: "Snorlax Promo (Gen 1) — (Promo Holo)", val: 25.00 }
         ];
 
         const PRODUCTS = [
@@ -479,7 +485,7 @@
             return 20;
         }
 
-        function parseCardParts(rawString) {
+        function parseCardParts(rawString, hasPokemonCenterStamp) {
             let name = "Pokemon";
             let gen = "Gen 1";
             let type = "Standard";
@@ -505,6 +511,11 @@
                 name = rawString;
             }
 
+            if (hasPokemonCenterStamp) {
+                name += " [Pokémon Center Stamp]";
+                type = "Promo Stamp";
+            }
+
             return { name, gen, type };
         }
 
@@ -515,7 +526,7 @@
                     <div class="market-item">
                         <div>
                             <strong>${p.name}</strong> <span class="badge">${p.sentiment}</span>
-                            <div style="font-size:12px; color:#aaa;">Contains ${p.packs} Pack(s)</div>
+                            <div style="font-size:12px; color:#aaa;">Contains ${p.packs} Pack(s)${p.id === 'etb' ? ' + Guaranteed Promo' : ''}</div>
                         </div>
                         <div>
                             <button onclick="buyProduct('${p.id}')">Buy $${p.price}</button>
@@ -544,7 +555,7 @@
                             <span class="tag tag-sealed">${item.packs} Pack(s)</span>
                         </div>
                         <div class="sealed-buttons">
-                            <button onclick="ripProduct(${item.id}, 'regular')">Rip Product ✂️</button>
+                            <button onclick="ripProduct(${item.id}, 'regular')">Open Product ✂️</button>
                             <button onclick="ripProduct(${item.id}, 'hits')" style="background:#ff9800; color:#fff;">Hits Only Stack 🔥</button>
                             <button onclick="ripProduct(${item.id}, 'open_all')" style="background:#2196F3; color:#fff;">Open All ⚡</button>
                         </div>
@@ -562,7 +573,8 @@
                 name: item.name,
                 prodId: item.id,
                 packsLeft: item.packs,
-                totalPacks: item.packs
+                totalPacks: item.packs,
+                isETB: (item.id === 'etb')
             };
 
             currentOpeningMode = mode;
@@ -581,6 +593,12 @@
 
         function setupNextPack() {
             currentPackCards = generateSinglePack();
+            
+            // If it's an ETB opening on the first pack, include the guaranteed Promo card!
+            if (activeProduct.isETB && activeProduct.packsLeft === activeProduct.totalPacks) {
+                currentPackCards.push(generateETBPromoCard());
+            }
+
             currentCardIndex = 0;
             isAllFlipped = false;
 
@@ -618,6 +636,11 @@
                 let fullPack = generateSinglePack();
                 autoBulkCards.push(...fullPack.slice(0, 9));
                 currentPackCards.push(fullPack[9]);
+            }
+
+            // Include promo if ETB hits-only stack
+            if (activeProduct.isETB) {
+                currentPackCards.push(generateETBPromoCard());
             }
 
             autoBulkCards.forEach(c => inventory.push(c));
@@ -661,6 +684,10 @@
                 allPulledCards.push(...pack);
             }
 
+            if (activeProduct.isETB) {
+                allPulledCards.push(generateETBPromoCard());
+            }
+
             allPulledCards.forEach(c => inventory.push(c));
             updateUI();
 
@@ -702,9 +729,16 @@
             let bulkItem = TIER_1_BULK_LIST[Math.floor(Math.random() * TIER_1_BULK_LIST.length)];
             pack.push(createCard(bulkItem.rawString, 'Bulk', bulkItem.val));
 
-            // LAST CARD ONLY FOR HEAVY HITS AND CHASES
             pack.push(rollLastCardHitSlot());
             return pack;
+        }
+
+        // GENERATE ETB PROMO CARD WITH 1% POKEMON CENTER STAMP CHANCE
+        function generateETBPromoCard() {
+            let promoItem = ETB_PROMOS[Math.floor(Math.random() * ETB_PROMOS.length)];
+            let hasStamp = Math.random() <= 0.01; // 1% Stamp Chance!
+            let finalVal = hasStamp ? promoItem.val * 3.5 : promoItem.val; // Stamp makes it worth much more!
+            return createCard(promoItem.rawString, 'HeavyHit', finalVal, hasStamp);
         }
 
         function rollLastCardHitSlot() {
@@ -748,8 +782,8 @@
             }
         }
 
-        function createCard(rawString, tier, baseVal) {
-            let parsed = parseCardParts(rawString);
+        function createCard(rawString, tier, baseVal, hasStamp = false) {
+            let parsed = parseCardParts(rawString, hasStamp);
             return {
                 id: Date.now() + Math.random(),
                 fullName: rawString,
@@ -791,7 +825,7 @@
             document.getElementById('packInstruction').innerText = `All ${currentPackCards.length} cards are stacked facedown! Click "Flip Cards" to flip them together.`;
             document.getElementById('packStageTitle').innerText = currentOpeningMode === 'hits' 
                 ? `🔥 Hits Only Stack (${currentPackCards.length} Total Cards)`
-                : `Ripping Pack (${activeProduct.totalPacks - activeProduct.packsLeft} of ${activeProduct.totalPacks})`;
+                : `Ripping Product (${activeProduct.totalPacks - activeProduct.packsLeft} of ${activeProduct.totalPacks})`;
 
             activeCardElements = [];
             currentCardIndex = 0;
