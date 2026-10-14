@@ -44,11 +44,25 @@
 
         .vault-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
 
-        .pack-rip-area { text-align: center; background: #18181c; padding: 20px; border-radius: 10px; border: 2px dashed #444; margin-top: 15px; position: relative; min-height: 520px; overflow: hidden; display: flex; flex-direction: column; align-items: center; }
+        .pack-rip-area {
+            text-align: center;
+            background: #18181c;
+            padding: 25px;
+            border-radius: 12px;
+            border: 2px dashed #444;
+            margin-top: 15px;
+            position: relative;
+            min-height: 680px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
         
         .pack-wrapper {
-            width: 180px; height: 280px; background: linear-gradient(135deg, #e63946, #b7094c);
-            margin: 20px auto; border-radius: 12px; border: 3px solid #ffb703;
+            width: 190px; height: 290px; background: linear-gradient(135deg, #e63946, #b7094c);
+            margin: 30px auto; border-radius: 12px; border: 3px solid #ffb703;
             display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 18px; text-align: center;
             color: #fff; cursor: pointer; position: relative; transition: transform 0.3s;
             box-shadow: 0 10px 20px rgba(0,0,0,0.5); padding: 10px; flex-shrink: 0;
@@ -63,8 +77,8 @@
         }
 
         .etb-wrapper {
-            width: 260px; height: 180px; background: linear-gradient(135deg, #2b2d42, #8d99ae);
-            margin: 40px auto; border-radius: 10px; border: 3px solid #7209b7;
+            width: 280px; height: 200px; background: linear-gradient(135deg, #2b2d42, #8d99ae);
+            margin: 40px auto; border-radius: 12px; border: 3px solid #7209b7;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             font-weight: bold; color: #fff; cursor: pointer; position: relative;
             box-shadow: 0 15px 25px rgba(114, 9, 183, 0.4); transition: transform 0.3s;
@@ -79,8 +93,8 @@
         }
 
         .box-wrapper {
-            width: 280px; height: 220px; background: linear-gradient(135deg, #3a0ca3, #4361ee);
-            margin: 30px auto; border-radius: 10px; border: 4px solid #4cc9f0;
+            width: 300px; height: 230px; background: linear-gradient(135deg, #3a0ca3, #4361ee);
+            margin: 30px auto; border-radius: 12px; border: 4px solid #4cc9f0;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             font-weight: bold; color: #fff; cursor: pointer; position: relative;
             box-shadow: 0 15px 30px rgba(67, 97, 238, 0.5); transition: transform 0.3s;
@@ -97,18 +111,18 @@
 
         .card-stack-wrapper {
             width: 100%;
-            max-height: 380px;
+            max-height: 540px;
             overflow-y: auto;
             display: flex;
             justify-content: center;
-            padding: 10px 0;
+            padding: 20px 0;
             position: relative;
         }
 
         .card-stack {
             position: relative;
-            width: 200px;
-            height: 290px;
+            width: 220px;
+            height: 350px;
             margin: 0 auto;
             flex-shrink: 0;
         }
@@ -136,21 +150,64 @@
         .physical-card-front, .physical-card-back {
             position: absolute; width: 100%; height: 100%;
             backface-visibility: hidden; border-radius: 10px;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            border: 2px solid #444; padding: 10px; box-sizing: border-box;
+            display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+            border: 2px solid #444; padding: 12px; box-sizing: border-box;
         }
 
         .physical-card-back {
             background: linear-gradient(135deg, #1d3557, #457b9d);
             color: #f1faee; font-weight: bold; border-color: #a8dadc;
+            justify-content: center;
         }
 
         .physical-card-front {
             background: #25252e; color: #fff; transform: rotateY(180deg);
         }
 
+        .card-type-top {
+            font-size: 11px;
+            font-weight: bold;
+            color: #ffd700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(0,0,0,0.4);
+            padding: 3px 8px;
+            border-radius: 4px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .card-name-middle {
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            margin: 10px 0;
+            color: #ffffff;
+            text-shadow: 0 0 5px rgba(0,0,0,0.8);
+        }
+
+        .card-price-sub {
+            font-size: 13px;
+            color: #4CAF50;
+            font-weight: bold;
+            margin-top: 2px;
+        }
+
+        .card-gen-bottom {
+            font-size: 11px;
+            color: #888;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-top: 1px solid #444;
+            width: 100%;
+            padding-top: 4px;
+            text-align: center;
+        }
+
         .physical-card.slide-up {
-            transform: translateY(-400px) !important;
+            transform: translateY(-450px) !important;
             opacity: 0;
             pointer-events: none;
         }
@@ -159,7 +216,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
             gap: 10px;
-            max-height: 350px;
+            max-height: 480px;
             width: 100%;
             overflow-y: auto;
             margin-top: 15px;
@@ -174,6 +231,9 @@
             font-size: 12px;
             border: 1px solid #444;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
         .open-all-card.is-hit {
             border: 2px solid #ffd700;
@@ -187,7 +247,7 @@
     <div class="header">
         <div>
             <h1>PCGC: Pokemon Card Grading Simulator</h1>
-            <div style="font-size: 12px; color: #4CAF50;">✨ Active & Stable Engine</div>
+            <div style="font-size: 12px; color: #4CAF50;">✨ Real Market Valuations & Calibrated Balances</div>
         </div>
         <div>
             <div class="cash">Cash: $<span id="cash">300.00</span></div>
@@ -261,7 +321,7 @@
 
             <div class="card-panel">
                 <h2>🔬 4. Grading Service (Choose Company)</h2>
-                <p style="font-size: 13px; color: #aaa;">Submit raw cards to PSA, CGC, or Beckett. Submitting low-grade pulls (8 or lower) results in financial loss!</p>
+                <p style="font-size: 13px; color: #aaa;">Submit raw cards to PSA, CGC, or Beckett. 50% chance of landing a Gem Mint 10 or Black Label for massive profit!</p>
                 <div id="gradingQueue"></div>
             </div>
         </div>
@@ -279,78 +339,94 @@
         let currentOpeningMode = 'regular';
 
         const COMMONS = [
-            "Pidgey (Gen 1)", "Rattata (Gen 1)", "Caterpie (Gen 1)", "Weedle (Gen 1)", "Metapod (Gen 1)", 
-            "Hoothoot (Gen 2)", "Noctowl (Gen 2)", "Ledyba (Gen 2)", "Spinarak (Gen 2)", "Ariados (Gen 2)",
-            "Wurmple (Gen 3)", "Seedot (Gen 3)", "Shroomish (Gen 3)", "Slakoth (Gen 3)", "Nincada (Gen 3)",
-            "Kricketot (Gen 4)", "Cherubi (Gen 4)", "Buneary (Gen 4)", "Patrat (Gen 5)", "Sewaddle (Gen 5)",
-            "Bunnelby (Gen 6)", "Fletchling (Gen 6)", "Yungoos (Gen 7)", "Skwovet (Gen 8)", "Tarountula (Gen 9)"
+            "Pidgey (Gen 1) — (Standard)", "Rattata (Gen 1) — (Standard)", "Caterpie (Gen 1) — (Standard)", 
+            "Weedle (Gen 1) — (Standard)", "Metapod (Gen 1) — (Standard)", "Hoothoot (Gen 2) — (Standard)", 
+            "Noctowl (Gen 2) — (Standard)", "Ledyba (Gen 2) — (Standard)", "Spinarak (Gen 2) — (Standard)", 
+            "Wurmple (Gen 3) — (Standard)", "Seedot (Gen 3) — (Standard)", "Shroomish (Gen 3) — (Standard)", 
+            "Kricketot (Gen 4) — (Standard)", "Cherubi (Gen 4) — (Standard)", "Buneary (Gen 4) — (Standard)", 
+            "Patrat (Gen 5) — (Standard)", "Sewaddle (Gen 5) — (Standard)", "Bunnelby (Gen 6) — (Standard)", 
+            "Fletchling (Gen 6) — (Standard)", "Yungoos (Gen 7) — (Standard)", "Skwovet (Gen 8) — (Standard)", 
+            "Tarountula (Gen 9) — (Standard)"
         ];
 
         const TIER_1_BULK_LIST = [
-            { name: "Zubat (Gen 1) — (Standard Holo)", val: 1.50 },
-            { name: "Yungoos (Gen 7) — (Standard Holo)", val: 1.50 },
-            { name: "Greedent (Gen 8) — (V, VMAX)", val: 3.00 },
-            { name: "Patrat (Gen 5) — (Standard Holo)", val: 1.50 },
-            { name: "Bidoof (Gen 4) — (GG Holo / Meme Special)", val: 5.00 },
-            { name: "Trubbish (Gen 5) — (Standard Holo)", val: 1.50 },
-            { name: "Garbodor (Gen 5) — (VMAX, Regular ex)", val: 3.50 },
-            { name: "Bruxish (Gen 7) — (Regular ex)", val: 2.50 },
-            { name: "Spidops (Gen 9) — (Tera ex)", val: 2.50 },
-            { name: "Tarountula (Gen 9) — (Illustration Rare)", val: 4.00 },
-            { name: "Tentacool (Gen 1) — (Standard Holo)", val: 1.50 },
-            { name: "Rattata (Gen 1) — (GX)", val: 3.00 },
-            { name: "Caterpie (Gen 1) — (Illustration Rare)", val: 6.00 },
-            { name: "Weedle (Gen 1) — (Standard Holo)", val: 1.50 },
-            { name: "Dunsparce (Gen 2) — (ex)", val: 2.50 },
-            { name: "Luvdisc (Gen 3) — (Standard Holo)", val: 1.50 },
-            { name: "Kricketune (Gen 4) — (V, Regular ex)", val: 2.50 },
-            { name: "Watchog (Gen 5) — (Standard Holo)", val: 1.50 },
-            { name: "Diggersby (Gen 6) — (Standard Holo)", val: 1.50 },
-            { name: "Gumshoos (Gen 7) — (GX)", val: 2.50 },
-            { name: "Blipbug (Gen 8) — (Standard Holo)", val: 1.50 },
-            { name: "Lechonk (Gen 9) — (Illustration Rare)", val: 5.00 }
+            { rawString: "Zubat (Gen 1) — (Standard Holo)", val: 1.50 },
+            { rawString: "Yungoos (Gen 7) — (Standard Holo)", val: 1.50 },
+            { rawString: "Greedent (Gen 8) — (V, VMAX)", val: 3.00 },
+            { rawString: "Patrat (Gen 5) — (Standard Holo)", val: 1.50 },
+            { rawString: "Bidoof (Gen 4) — (GG Holo, Meme Special)", val: 5.00 },
+            { rawString: "Trubbish (Gen 5) — (Standard Holo)", val: 1.50 },
+            { rawString: "Garbodor (Gen 5) — (VMAX, Regular ex)", val: 3.50 },
+            { rawString: "Bruxish (Gen 7) — (Regular ex)", val: 2.50 },
+            { rawString: "Spidops (Gen 9) — (Tera ex)", val: 2.50 },
+            { rawString: "Tarountula (Gen 9) — (Illustration Rare)", val: 4.00 },
+            { rawString: "Tentacool (Gen 1) — (Standard Holo)", val: 1.50 },
+            { rawString: "Rattata (Gen 1) — (GX)", val: 3.00 },
+            { rawString: "Caterpie (Gen 1) — (Illustration Rare)", val: 6.00 },
+            { rawString: "Weedle (Gen 1) — (Standard Holo)", val: 1.50 },
+            { rawString: "Dunsparce (Gen 2) — (ex)", val: 2.50 },
+            { rawString: "Luvdisc (Gen 3) — (Standard Holo)", val: 1.50 },
+            { rawString: "Kricketune (Gen 4) — (V, Regular ex)", val: 2.50 },
+            { rawString: "Watchog (Gen 5) — (Standard Holo)", val: 1.50 },
+            { rawString: "Diggersby (Gen 6) — (Standard Holo)", val: 1.50 },
+            { rawString: "Gumshoos (Gen 7) — (GX)", val: 2.50 },
+            { rawString: "Blipbug (Gen 8) — (Standard Holo)", val: 1.50 },
+            { rawString: "Lechonk (Gen 9) — (Illustration Rare)", val: 5.00 }
         ];
 
         const TIER_2_FILLER_LIST = [
-            { name: "Chikorita (Gen 2) — (Illustration Rare)", val: 12.00 },
-            { name: "Cyndaquil (Gen 2) — (Illustration Rare)", val: 15.00 },
-            { name: "Totodile (Gen 2) — (Illustration Rare)", val: 14.00 },
-            { name: "Treecko (Gen 3) — (Standard Holo)", val: 6.00 },
-            { name: "Torchic (Gen 3) — (Standard Holo)", val: 6.00 },
-            { name: "Mudkip (Gen 3) — (Standard Holo)", val: 8.00 },
-            { name: "Mareep (Gen 2) — (GG Art Holo)", val: 9.00 },
-            { name: "Wooper (Gen 2) — (Shiny Vault, ex)", val: 10.00 },
-            { name: "Marill (Gen 2) — (Illustration Rare)", val: 12.00 },
-            { name: "Psyduck (Gen 1) — (Illustration Rare)", val: 18.00 },
-            { name: "Growlithe (Gen 1) — (Illustration Rare)", val: 16.00 },
-            { name: "Riolu (Gen 4) — (Shiny Vault, Illustration Rare)", val: 14.00 }
+            { rawString: "Chikorita (Gen 2) — (Illustration Rare)", val: 12.00 },
+            { rawString: "Cyndaquil (Gen 2) — (Illustration Rare)", val: 15.00 },
+            { rawString: "Totodile (Gen 2) — (Illustration Rare)", val: 14.00 },
+            { rawString: "Treecko (Gen 3) — (Standard Holo)", val: 6.00 },
+            { rawString: "Torchic (Gen 3) — (Standard Holo)", val: 6.00 },
+            { rawString: "Mudkip (Gen 3) — (Standard Holo)", val: 8.00 },
+            { rawString: "Mareep (Gen 2) — (GG Art Holo)", val: 9.00 },
+            { rawString: "Wooper (Gen 2) — (Shiny Vault, ex)", val: 10.00 },
+            { rawString: "Marill (Gen 2) — (Illustration Rare)", val: 12.00 },
+            { rawString: "Psyduck (Gen 1) — (Illustration Rare)", val: 18.00 },
+            { rawString: "Growlithe (Gen 1) — (Illustration Rare)", val: 16.00 },
+            { rawString: "Riolu (Gen 4) — (Shiny Vault, Illustration Rare)", val: 14.00 }
         ];
 
+        // REAL MARKETPLACE BASED RANKED HEAVY HIT LIST
         const TIER_3_HEAVY_LIST = [
-            { name: "Gengar (Gen 1) — (GX, VMAX, Regular ex)", val: 45.00 },
-            { name: "Alakazam (Gen 1) — (Gold Star, LX, ex)", val: 55.00 },
-            { name: "Machamp (Gen 1) — (GX, VMAX, ex)", val: 35.00 },
-            { name: "Gyarados (Gen 1) — (GX, VMAX, Tera ex)", val: 50.00 },
-            { name: "Lapras (Gen 1) — (VMAX, ex, Tera ex)", val: 30.00 },
-            { name: "Snorlax (Gen 1) — (VMAX, Secret Rare)", val: 60.00 },
-            { name: "Dragonite (Gen 1) — (GX, VSTAR, ex)", val: 65.00 },
-            { name: "Tyranitar (Gen 2) — (GX, VMAX, Tera ex)", val: 55.00 },
-            { name: "Gardevoir (Gen 3) — (GX, VMAX, ex)", val: 60.00 },
-            { name: "Lucario (Gen 4) — (GX, VSTAR, ex)", val: 50.00 },
-            { name: "Greninja (Gen 6) — (GX, Tera ex / Modern Grail)", val: 85.00 },
-            { name: "Sylveon (Gen 6) — (GX, VMAX / Alt Art)", val: 75.00 }
+            { rawString: "Alakazam (Gen 1) — (Gold Star, ex, Lv.X)", val: 280.00, weight: 5 },
+            { rawString: "Metagross (Gen 3) — (Gold Star, ex, GX)", val: 260.00, weight: 5 },
+            { rawString: "Greninja (Gen 6) — (Tera ex, Twilight Masquerade SIR, GX)", val: 280.00, weight: 8 },
+            { rawString: "Sylveon (Gen 6) — (VMAX, Evolving Skies Alt Art, GX)", val: 220.00, weight: 8 },
+            { rawString: "Gengar (Gen 1) — (ex, Fusion Strike VMAX Alt Art, FRLG ex, GX)", val: 220.00, weight: 22 },
+            { rawString: "Tyranitar (Gen 2) — (Tera ex, ex, GX)", val: 120.00, weight: 10 },
+            { rawString: "Dragonite (Gen 1) — (ex, GX, VSTAR)", val: 110.00, weight: 10 },
+            { rawString: "Gardevoir (Gen 3) — (ex, GX, VMAX)", val: 80.00, weight: 10 },
+            { rawString: "Salamence (Gen 3) — (ex, GX, VMAX)", val: 75.00, weight: 10 },
+            { rawString: "Scizor (Gen 2) — (ex, Prime, GX)", val: 65.00, weight: 10 },
+            { rawString: "Garchomp (Gen 4) — (Tera ex, GX)", val: 50.00, weight: 12 },
+            { rawString: "Gyarados (Gen 1) — (Tera ex, ex, GX)", val: 48.00, weight: 12 },
+            { rawString: "Snorlax (Gen 1) — (Secret Rare, VMAX)", val: 45.00, weight: 12 },
+            { rawString: "Machamp (Gen 1) — (VMAX, ex, GX)", val: 45.00, weight: 12 },
+            { rawString: "Mimikyu (Gen 7) — (VMAX, GX)", val: 35.00, weight: 15 },
+            { rawString: "Ceruledge (Gen 9) — (Illustration Rare, ex)", val: 30.00, weight: 15 },
+            { rawString: "Lucario (Gen 4) — (ex, VSTAR, GX)", val: 25.00, weight: 15 },
+            { rawString: "Lapras (Gen 1) — (Tera ex, ex, VMAX)", val: 25.00, weight: 15 },
+            { rawString: "Armarouge (Gen 9) — (Illustration Rare, ex)", val: 18.00, weight: 18 },
+            { rawString: "Hydreigon (Gen 5) — (Tera ex, Break)", val: 18.00, weight: 18 },
+            { rawString: "Zoroark (Gen 5) — (VSTAR, GX)", val: 16.00, weight: 18 },
+            { rawString: "Dragapult (Gen 8) — (VMAX, ex)", val: 15.00, weight: 18 }
         ];
 
+        // REAL MARKETPLACE BASED TIER 4 CHASE CARDS
         const TIER_4_CHASE_STANDARD = [
-            { name: "Vaporeon (Gen 1) — (VMAX / Premium Promo)", val: 120.00 },
-            { name: "Jolteon (Gen 1) — (VMAX / Premium Promo)", val: 120.00 },
-            { name: "Flareon (Gen 1) — (VMAX / Premium Promo)", val: 120.00 },
-            { name: "Roaring Moon (Gen 9) — (Ancient ex SIR)", val: 180.00 },
-            { name: "Giratina (Gen 4) — (GX, VSTAR / Alt Art)", val: 200.00 },
-            { name: "Arceus (Gen 4) — (LV.X, GX / Gold Secret)", val: 160.00 },
-            { name: "Mewtwo (Gen 1) — (Gold Star, GX, ex)", val: 220.00 },
-            { name: "Mew (Gen 1) — (Gold Star, VMAX, Tera ex)", val: 250.00 },
-            { name: "Lugia (Gen 2) — (LEGEND, VSTAR / Alt Art)", val: 350.00 }
+            { rawString: "Vaporeon (Gen 1) — (VMAX, Premium Promo)", val: 120.00 },
+            { rawString: "Jolteon (Gen 1) — (VMAX, Premium Promo)", val: 120.00 },
+            { rawString: "Flareon (Gen 1) — (VMAX, Premium Promo)", val: 120.00 },
+            { rawString: "Roaring Moon (Gen 9) — (Ancient ex SIR)", val: 180.00 },
+            { rawString: "Giratina (Gen 4) — (GX, VSTAR, Alt Art)", val: 280.00 },
+            { rawString: "Arceus (Gen 4) — (LV.X, GX, Gold Secret)", val: 160.00 },
+            { rawString: "Mewtwo (Gen 1) — (Gold Star, GX, ex)", val: 220.00 },
+            { rawString: "Mew (Gen 1) — (Gold Star, VMAX, Tera ex)", val: 250.00 },
+            { rawString: "Eevee (Gen 1) — (GX, VMAX, Shiny Vault)", val: 100.00 },
+            { rawString: "Lugia (Gen 2) — (LEGEND, VSTAR, Alt Art)", val: 350.00 }
         ];
 
         const TAG_TEAM_LIST = [
@@ -401,6 +477,35 @@
             if (rawVal >= 100) return 85;
             if (rawVal >= 25) return 45;
             return 20;
+        }
+
+        function parseCardParts(rawString) {
+            let name = "Pokemon";
+            let gen = "Gen 1";
+            let type = "Standard";
+
+            try {
+                let parts = rawString.split("—");
+                let nameGenPart = parts[0] ? parts[0].trim() : rawString;
+                let typesPart = parts[1] ? parts[1].replace(/[\(\)]/g, '').trim() : "";
+
+                let matchGen = nameGenPart.match(/\((Gen \d+)\)/i);
+                if (matchGen) {
+                    gen = matchGen[1];
+                    name = nameGenPart.replace(/\((Gen \d+)\)/i, '').trim();
+                } else {
+                    name = nameGenPart;
+                }
+
+                if (typesPart) {
+                    let typeOptions = typesPart.split(',').map(t => t.trim());
+                    type = typeOptions[Math.floor(Math.random() * typeOptions.length)];
+                }
+            } catch (e) {
+                name = rawString;
+            }
+
+            return { name, gen, type };
         }
 
         function renderShop() {
@@ -511,8 +616,8 @@
 
             for (let i = 0; i < activeProduct.totalPacks; i++) {
                 let fullPack = generateSinglePack();
-                autoBulkCards.push(...fullPack.slice(0, 7));
-                currentPackCards.push(fullPack[7], fullPack[8], fullPack[9]);
+                autoBulkCards.push(...fullPack.slice(0, 9));
+                currentPackCards.push(fullPack[9]);
             }
 
             autoBulkCards.forEach(c => inventory.push(c));
@@ -563,9 +668,10 @@
                 let isHit = (card.tier === 'Chase' || card.tier === 'HeavyHit' || card.tier === 'Filler');
                 html += `
                     <div class="open-all-card ${isHit ? 'is-hit' : ''}">
-                        <strong style="color: ${isHit ? '#ffd700' : '#fff'}">${card.name}</strong>
-                        <div style="font-size: 10px; color: #aaa;">${card.tier}</div>
-                        <div style="font-size: 11px; color: #4CAF50; margin-top: 4px;">$${card.baseValue.toFixed(2)}</div>
+                        <div class="card-type-top">${card.selectedType}</div>
+                        <div class="card-name-middle" style="color:${isHit ? '#ffd700' : '#fff'}">${card.name}</div>
+                        <div class="card-price-sub">$${card.baseValue.toFixed(2)}</div>
+                        <div class="card-gen-bottom">${card.gen}</div>
                     </div>`;
             });
 
@@ -591,50 +697,65 @@
                 pack.push(createCard(name, 'Uncommon', 1.50));
             }
             let revHoloName = COMMONS[Math.floor(Math.random() * COMMONS.length)];
-            pack.push(createCard("Reverse Holo " + revHoloName, 'Rare', 3.00));
+            pack.push(createCard(revHoloName, 'Rare', 3.00));
             
-            pack.push(rollHitSlot());
-            pack.push(rollHitSlot());
+            let bulkItem = TIER_1_BULK_LIST[Math.floor(Math.random() * TIER_1_BULK_LIST.length)];
+            pack.push(createCard(bulkItem.rawString, 'Bulk', bulkItem.val));
+
+            // LAST CARD ONLY FOR HEAVY HITS AND CHASES
+            pack.push(rollLastCardHitSlot());
             return pack;
         }
 
-        function rollHitSlot() {
+        function rollLastCardHitSlot() {
             let roll = Math.random() * 100;
 
-            if (roll <= 5.0) {
+            if (roll <= 12.0) { 
                 let subRoll = Math.random() * 100;
 
                 if (subRoll <= 1.0) {
-                    return createCard("Umbreon (Gen 2) — (Gold Star, 'Moonbreon' Alternate Art)", 'Chase', 850.00);
+                    return createCard("Umbreon (Gen 2) — (Gold Star, Moonbreon Alt Art)", 'Chase', 850.00);
                 } else if (subRoll <= 3.0) {
-                    return createCard("Charizard (Gen 1) — (Base Set Holographic, GX, VMAX, Tera ex)", 'Chase', 500.00);
+                    return createCard("Charizard (Gen 1) — (Base Set Holo, GX, VMAX, Tera ex)", 'Chase', 350.00);
                 } else if (subRoll <= 5.0) {
-                    return createCard("Pikachu (Gen 1) — (VMAX, VSTAR, Stellar Tera ex)", 'Chase', 350.00);
+                    return createCard("Pikachu (Gen 1) — (VMAX, VSTAR, Stellar Tera ex)", 'Chase', 320.00);
                 } else if (subRoll <= 7.0) {
-                    return createCard("Rayquaza (Gen 3) — (Gold Star, GX, VMAX / Alternate Art)", 'Chase', 400.00);
+                    return createCard("Rayquaza (Gen 3) — (Gold Star, GX, VMAX, Alt Art)", 'Chase', 400.00);
                 } else if (subRoll <= 17.0) {
                     let tagCard = TAG_TEAM_LIST[Math.floor(Math.random() * TAG_TEAM_LIST.length)];
-                    return createCard(`Tag Team — (${tagCard})`, 'Chase', 280.00);
+                    return createCard(`${tagCard} (Gen 7) — (Tag Team GX)`, 'Chase', 280.00);
                 } else {
                     let item = TIER_4_CHASE_STANDARD[Math.floor(Math.random() * TIER_4_CHASE_STANDARD.length)];
-                    return createCard(item.name, 'Chase', item.val);
+                    return createCard(item.rawString, 'Chase', item.val);
                 }
-            } else if (roll <= 20.0) {
-                let item = TIER_3_HEAVY_LIST[Math.floor(Math.random() * TIER_3_HEAVY_LIST.length)];
-                return createCard(item.name, 'HeavyHit', item.val);
-            } else if (roll <= 50.0) {
+            } else if (roll <= 45.0) { 
+                let totalWeight = TIER_3_HEAVY_LIST.reduce((acc, c) => acc + (c.weight || 10), 0);
+                let randomWeight = Math.random() * totalWeight;
+                let currentSum = 0;
+                let selectedItem = TIER_3_HEAVY_LIST[0];
+
+                for (let item of TIER_3_HEAVY_LIST) {
+                    currentSum += (item.weight || 10);
+                    if (randomWeight <= currentSum) {
+                        selectedItem = item;
+                        break;
+                    }
+                }
+                return createCard(selectedItem.rawString, 'HeavyHit', selectedItem.val);
+            } else { 
                 let item = TIER_2_FILLER_LIST[Math.floor(Math.random() * TIER_2_FILLER_LIST.length)];
-                return createCard(item.name, 'Filler', item.val);
-            } else {
-                let item = TIER_1_BULK_LIST[Math.floor(Math.random() * TIER_1_BULK_LIST.length)];
-                return createCard(item.name, 'Bulk', item.val);
+                return createCard(item.rawString, 'Filler', item.val);
             }
         }
 
-        function createCard(name, tier, baseVal) {
+        function createCard(rawString, tier, baseVal) {
+            let parsed = parseCardParts(rawString);
             return {
                 id: Date.now() + Math.random(),
-                name: name,
+                fullName: rawString,
+                name: parsed.name,
+                gen: parsed.gen,
+                selectedType: parsed.type,
                 tier: tier,
                 baseValue: baseVal,
                 state: 'Raw'
@@ -682,18 +803,21 @@
                 let cardEl = document.createElement('div');
                 cardEl.className = 'physical-card';
                 
-                let offset = Math.min(idx * 0.5, 20);
+                let offset = Math.min(idx * 0.8, 35);
                 cardEl.style.top = `${offset}px`;
-                cardEl.style.left = `${offset * 0.5}px`;
+                cardEl.style.left = `${offset * 0.4}px`;
                 cardEl.style.zIndex = currentPackCards.length - idx;
 
                 cardEl.innerHTML = `
                     <div class="physical-card-inner">
                         <div class="physical-card-back">TCG CARD</div>
                         <div class="physical-card-front rarity-${card.tier}">
-                            <div style="font-size:11px; color:#aaa; text-transform:uppercase;">${card.tier}</div>
-                            <div style="font-size:13px; font-weight:bold; margin:8px 0; text-align:center;">${card.name}</div>
-                            <div style="font-size:13px; color:#4CAF50;">$${card.baseValue.toFixed(2)}</div>
+                            <div class="card-type-top">${card.selectedType}</div>
+                            <div style="text-align:center;">
+                                <div class="card-name-middle">${card.name}</div>
+                                <div class="card-price-sub">$${card.baseValue.toFixed(2)}</div>
+                            </div>
+                            <div class="card-gen-bottom">${card.gen}</div>
                         </div>
                     </div>`;
 
@@ -794,8 +918,8 @@
                 html += `
                     <div class="card-item rarity-${card.tier}">
                         <div>
-                            <strong>${card.name}</strong> ${stateTag}
-                            <div style="font-size:12px; color:#aaa;">Market Value: $${val.toFixed(2)}</div>
+                            <strong>${card.name}</strong> <span style="font-size:11px; color:#ffd700;">[${card.selectedType}]</span> ${stateTag}
+                            <div style="font-size:12px; color:#aaa;">${card.gen} | Market Value: $${val.toFixed(2)}</div>
                         </div>
                         <div>
                             ${card.state === 'Raw' ? `<button onclick="gradeCard('${card.id}')" style="font-size:11px;">Grade ($${fee})</button>` : ''}
@@ -841,18 +965,18 @@
 
             let roll = Math.random() * 100;
             let finalGrade = 10;
+            let isBlackLabel = false;
 
-            if (roll <= 30) {
+            if (roll <= 50.0) {
                 finalGrade = 10.0;
-            } else if (roll <= 60) {
+                if (company === 'Beckett' && Math.random() <= 0.20) {
+                    isBlackLabel = true;
+                }
+            } else if (roll <= 80.0) {
                 finalGrade = (company === 'Beckett' || company === 'CGC') ? 9.5 : 9.0;
-            } else if (roll <= 80) {
-                finalGrade = 8.5;
             } else {
-                finalGrade = 8.0;
+                finalGrade = 8.5;
             }
-
-            let isBlackLabel = (company === 'Beckett' && finalGrade === 10 && Math.random() <= 0.08);
 
             card.state = 'Graded';
             card.gradingInfo = {
@@ -862,7 +986,8 @@
             };
 
             updateUI();
-            alert(`🎉 Grading complete with ${company}! Result: ${company} ${finalGrade}${isBlackLabel ? ' (BLACK LABEL!)' : ''}`);
+            let profitMargin = (getItemMarketValue(card) - card.baseValue - fee).toFixed(2);
+            alert(`🎉 Grading complete with ${company}! Result: ${company} ${finalGrade}${isBlackLabel ? ' (BLACK LABEL!)' : ''}\nEstimated Net Profit: $${profitMargin}`);
         }
 
         updateUI();
