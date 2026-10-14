@@ -1,4 +1,4 @@
-# 🎴 PCCG = TCG Sourcing & Market Simulator
+# 🎴 PGCC = TCG Sourcing & Market Simulator
 
 A web-based trading card game simulation where you can buy sealed product, rip open 10-card booster packs with realistic stack-sliding mechanics, collect rare pulls, and submit raw cards to PSA, CGC, or Beckett for grading.
 
