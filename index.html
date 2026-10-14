@@ -263,34 +263,9 @@
             border-color: #ffd700;
             background: #2e2610;
         }
-
-        .grail-banner {
-            position: fixed;
-            top: -100px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, #ffd700, #ff8c00);
-            color: #000;
-            padding: 15px 30px;
-            border-radius: 30px;
-            font-weight: bold;
-            font-size: 18px;
-            box-shadow: 0 0 25px rgba(255, 215, 0, 0.8), 0 0 50px rgba(255, 140, 0, 0.5);
-            border: 2px solid #fff;
-            z-index: 9999;
-            transition: top 0.5s ease-in-out;
-            text-align: center;
-        }
-        .grail-banner.show {
-            top: 20px;
-        }
     </style>
 </head>
 <body>
-
-    <div id="grailBanner" class="grail-banner">
-        🌌 GRAIL UNLOCKED! You pulled Moonbreon! (+ Special Gold Status)
-    </div>
 
     <div class="header">
         <div>
@@ -312,14 +287,14 @@
                 <h3 style="margin-top: 20px; font-size: 15px; color: #00ffcc;">🛡️ Protective Supplies</h3>
                 <div class="market-item">
                     <div>
-                        <strong>Penny Sleeves (Pack of 10)</strong>
+                        <strong>Penny Sleeves</strong>
                         <div style="font-size:12px; color:#aaa;">Owned: <span id="sleeveCount">0</span> | Prevents bad grade rolls (min PSA 9.0)</div>
                     </div>
                     <button onclick="buySupplies('sleeve', 0.50)">Buy $0.50</button>
                 </div>
                 <div class="market-item">
                     <div>
-                        <strong>Hard Toploaders (Pack of 20)</strong>
+                        <strong>Hard Toploaders</strong>
                         <div style="font-size:12px; color:#aaa;">Owned: <span id="toploaderCount">0</span> | Boosts PSA 10 rate to 60%!</div>
                     </div>
                     <button onclick="buySupplies('toploader', 2.00)">Buy $2.00</button>
@@ -417,8 +392,6 @@
             { id: 'moonbreon_grail', name: '🌌 Grail Hunter', desc: 'Pull a Moonbreon Alt Art card', reward: 500, unlocked: false }
         ];
 
-        const RARITY_RANK = { 'Chase': 6, 'HeavyHit': 5, 'Filler': 4, 'Bulk': 3, 'Rare': 2, 'Uncommon': 1, 'Common': 0 };
-
         const COMMONS = [
             "Pidgey (Gen 1) — (Standard)", "Rattata (Gen 1) — (Standard)", "Caterpie (Gen 1) — (Standard)", 
             "Weedle (Gen 1) — (Standard)", "Metapod (Gen 1) — (Standard)", "Hoothoot (Gen 2) — (Standard)", 
@@ -494,6 +467,8 @@
             { id: 'box', name: 'Booster Box (36 Packs)', price: 320, packs: 36 },
             { id: 'vintage', name: '1999 Vintage Base Set Pack', price: 1500, packs: 1 }
         ];
+
+        const RARITY_RANK = { 'Chase': 6, 'HeavyHit': 5, 'Filler': 4, 'Bulk': 3, 'Rare': 2, 'Uncommon': 1, 'Common': 0 };
 
         function updateUI() {
             document.getElementById('cash').innerText = cash.toFixed(2);
@@ -583,8 +558,8 @@
         function buySupplies(type, cost) {
             if (cash < cost) { alert("Not enough cash!"); return; }
             cash -= cost;
-            if (type === 'sleeve') sleevesCount += 10;
-            if (type === 'toploader') toploadersCount += 20;
+            if (type === 'sleeve') sleevesCount++;
+            if (type === 'toploader') toploadersCount++;
             updateUI();
         }
 
@@ -717,7 +692,7 @@
             document.getElementById('cardStack').innerHTML = '';
             document.getElementById('packControls').style.display = 'none';
             document.getElementById('packInstruction').style.display = 'none';
-            document.getElementById('packStageTitle').innerText = `Ready to Open ${activeProduct.name} (${activeProduct.totalPacks - activeProduct.packsLeft + 1} of${activeProduct.totalPacks})!`;
+            document.getElementById('packStageTitle').innerText = `Ready to Open ${activeProduct.name} (${activeProduct.totalPacks - activeProduct.packsLeft + 1} of ${activeProduct.totalPacks})!`;
         }
 
         function setupHitsOnlyStack() {
@@ -787,7 +762,8 @@
                 html += `
                     <div class="open-all-card ${isHit ? 'is-hit' : ''}">
                         <div class="card-type-top">${card.selectedType}</div>
-                        <div class="card-name-middle" style="color:${isHit ? '#ffd700' : '#fff'}">${card.name}${card.isMisprint ? ' [' + card.misprintType.toUpperCase() + ']' : ''}</div> <div class="card-price-sub">$${getItemMarketValue(card).toFixed(2)}</div>
+                        <div class="card-name-middle" style="color:${isHit ? '#ffd700' : '#fff'}">${card.name}${card.isMisprint ? ' [MISPRINT]' : ''}</div>
+                        <div class="card-price-sub">$${getItemMarketValue(card).toFixed(2)}</div>
                         <div class="card-gen-bottom">${card.gen}</div>
                     </div>`;
             });
@@ -803,9 +779,11 @@
             };
         }
 
+        // GENERATE PACK (EXACTLY 0.05% GOD PACK CHANCE)
         function generateSinglePack(isVintage = false) {
             let pack = [];
 
+            // 0.05% GOD PACK CHANCE (1 in 2000 packs)
             let isGodPack = Math.random() <= 0.0005; 
 
             if (isGodPack) {
@@ -819,15 +797,8 @@
             if (isVintage) {
                 for (let i = 0; i < 6; i++) pack.push(createCard("Vintage Common (Gen 1) — (Base Set)", 'Common', 8.00));
                 for (let i = 0; i < 3; i++) pack.push(createCard("Vintage Uncommon (Gen 1) — (Base Set)", 'Uncommon', 18.00));
-                
-                let isVintageHoloHit = Math.random() <= 0.05; 
-
-                if (isVintageHoloHit) {
-                    let grail = VINTAGE_GRAILS[Math.floor(Math.random() * VINTAGE_GRAILS.length)];
-                    pack.push(createCard(grail.rawString, 'Chase', grail.val));
-                } else {
-                    pack.push(createCard("Vintage Rare Non-Holo (Gen 1) — (Base Set)", 'Rare', 25.00));
-                }
+                let grail = VINTAGE_GRAILS[Math.floor(Math.random() * VINTAGE_GRAILS.length)];
+                pack.push(createCard(grail.rawString, 'Chase', grail.val));
                 return pack;
             }
 
@@ -901,12 +872,7 @@
 
         function createCard(rawString, tier, baseVal, hasStamp = false) {
             let parsed = parseCardParts(rawString, hasStamp);
-            let isMisprint = Math.random() <= 0.005; 
-            let misprintType = null;
-
-            if (isMisprint) {
-                misprintType = Math.random() < 0.5 ? "Square Cut" : "Inverted Back";
-            }
+            let isMisprint = Math.random() <= 0.01; // 1% Misprint Chance
 
             return {
                 id: Date.now() + Math.random(),
@@ -918,8 +884,7 @@
                 baseValue: baseVal,
                 state: 'Raw',
                 protection: 'none',
-                isMisprint: isMisprint,
-                misprintType: misprintType
+                isMisprint: isMisprint
             };
         }
 
@@ -956,7 +921,7 @@
             document.getElementById('packInstruction').innerText = `All ${currentPackCards.length} cards are stacked facedown! Click "Flip Cards" to flip them together.`;
             document.getElementById('packStageTitle').innerText = currentOpeningMode === 'hits' 
                 ? `🔥 Hits Only Stack (${currentPackCards.length} Total Cards)`
-                : `Ripping Product (${activeProduct.totalPacks - activeProduct.packsLeft + 1} of${activeProduct.totalPacks})`;
+                : `Ripping Product (${activeProduct.totalPacks - activeProduct.packsLeft + 1} of ${activeProduct.totalPacks})`;
 
             activeCardElements = [];
             currentCardIndex = 0;
@@ -979,7 +944,8 @@
                         <div class="physical-card-front rarity-${card.tier}">
                             <div class="card-type-top">${card.selectedType}</div>
                             <div style="text-align:center;">
-                                <div class="card-name-middle">${card.name}${card.isMisprint ? ' <span style="color:#ff0055;">[' + card.misprintType.toUpperCase() + ']</span>' : ''}</div> <div class="card-price-sub">$${getItemMarketValue(card).toFixed(2)}</div>
+                                <div class="card-name-middle">${card.name}${card.isMisprint ? ' <span style="color:#ff0055;">[MISPRINT]</span>' : ''}</div>
+                                <div class="card-price-sub">$${getItemMarketValue(card).toFixed(2)}</div>
                             </div>
                             <div class="card-gen-bottom">${card.gen}</div>
                         </div>
@@ -1020,7 +986,7 @@
             currentCardIndex++;
 
             if (currentCardIndex < currentPackCards.length) {
-                document.getElementById('packStageTitle').innerText = `Card ${currentCardIndex + 1} of${currentPackCards.length} Revealed! Click to slide UP.`;
+                document.getElementById('packStageTitle').innerText = `Card ${currentCardIndex + 1} of ${currentPackCards.length} Revealed! Click to slide UP.`;
             } else {
                 if (currentOpeningMode === 'regular') {
                     activeProduct.packsLeft--;
@@ -1029,7 +995,7 @@
                 }
 
                 if (activeProduct.packsLeft > 0) {
-                    document.getElementById('packStageTitle').innerText = `🎉 Pack Finished! ${activeProduct.packsLeft} pack(s) remaining in${activeProduct.name}.`;
+                    document.getElementById('packStageTitle').innerText = `🎉 Pack Finished! ${activeProduct.packsLeft} pack(s) remaining in ${activeProduct.name}.`;
                     document.getElementById('packControls').style.display = 'block';
                     document.getElementById('actionBtn').innerText = "Open Next Pack ➡️";
                     document.getElementById('actionBtn').onclick = setupNextPack;
@@ -1084,14 +1050,14 @@
                     : '';
 
                 let misprintTag = card.isMisprint
-                    ? `<span class="tag tag-misprint">${card.misprintType.toUpperCase()} (2.5x)</span>`
+                    ? `<span class="tag tag-misprint">MISPRINT 2.5x</span>`
                     : '';
 
                 html += `
                     <div class="card-item rarity-${card.tier}">
                         <div>
-                            <strong>${card.name}</strong> <span style="font-size:11px; color:#ffd700;">[${card.selectedType}]</span>${stateTag} ${protectionTag}${misprintTag}
-                            <div style="font-size:12px; color:#aaa;">${card.gen} \vert{} Market Value:$${val.toFixed(2)}</div>
+                            <strong>${card.name}</strong> <span style="font-size:11px; color:#ffd700;">[${card.selectedType}]</span> ${stateTag} ${protectionTag} ${misprintTag}
+                            <div style="font-size:12px; color:#aaa;">${card.gen} | Market Value: $${val.toFixed(2)}</div>
                         </div>
                         <div>
                             ${card.state === 'Raw' && card.protection === 'none' ? `
@@ -1182,7 +1148,7 @@
 
             updateUI();
             let profitMargin = (getItemMarketValue(card) - card.baseValue - fee).toFixed(2);
-            alert(`🎉 Grading complete with ${company}! Result: ${company}${finalGrade}${isBlackLabel ? ' (BLACK LABEL!)' : ''}\nEstimated Net Profit: $${profitMargin}`);
+            alert(`🎉 Grading complete with ${company}! Result: ${company} ${finalGrade}${isBlackLabel ? ' (BLACK LABEL!)' : ''}\nEstimated Net Profit: $${profitMargin}`);
         }
 
         function checkAchievements() {
@@ -1198,23 +1164,8 @@
         function unlockAch(ach) {
             ach.unlocked = true;
             cash += ach.reward;
-
-            if (ach.id === 'moonbreon_grail') {
-                showGoldBanner();
-            } else {
-                alert(`🏆 ACHIEVEMENT UNLOCKED: ${ach.name}!\nReward: +$${ach.reward}.00`);
-            }
-
+            alert(`🏆 ACHIEVEMENT UNLOCKED: ${ach.name}!\nReward: +$${ach.reward}.00`);
             updateUI();
-        }
-
-        function showGoldBanner() {
-            let banner = document.getElementById('grailBanner');
-            banner.classList.add('show');
-            
-            setTimeout(() => {
-                banner.classList.remove('show');
-            }, 4000);
         }
 
         function renderAchievements() {
@@ -1223,8 +1174,10 @@
                 html += `
                     <div class="achievement-badge ${ach.unlocked ? 'unlocked' : ''}">
                         <div>
-                            <strong>${ach.name}</strong>${ach.unlocked ? '✅' : '🔒'}
-                            <div style="font-size:12px; color:#aaa;">${ach.desc}</div> </div> <div style="font-weight:bold; color:#ffd700;">+$${ach.reward}</div>
+                            <strong>${ach.name}</strong> ${ach.unlocked ? '✅' : '🔒'}
+                            <div style="font-size:12px; color:#aaa;">${ach.desc}</div>
+                        </div>
+                        <div style="font-weight:bold; color:#ffd700;">+$${ach.reward}</div>
                     </div>`;
             });
             document.getElementById('achievementList').innerHTML = html;
