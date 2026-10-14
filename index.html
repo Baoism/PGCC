@@ -247,7 +247,7 @@
     <div class="header">
         <div>
             <h1>PCGC: Pokemon Card Grading Simulator</h1>
-            <div style="font-size: 12px; color: #4CAF50;">✨ ETB Promo & Pokémon Center Stamp Update Active</div>
+            <div style="font-size: 12px; color: #4CAF50;">✨ Alakazam $200 & Re-calibrated Drop Rates</div>
         </div>
         <div>
             <div class="cash">Cash: $<span id="cash">300.00</span></div>
@@ -389,8 +389,9 @@
             { rawString: "Riolu (Gen 4) — (Shiny Vault, Illustration Rare)", val: 14.00 }
         ];
 
+        // HEAVY HITS WITH ALAKAZAM ADJUSTED TO $200.00
         const TIER_3_HEAVY_LIST = [
-            { rawString: "Alakazam (Gen 1) — (Gold Star, ex, Lv.X)", val: 280.00, weight: 5 },
+            { rawString: "Alakazam (Gen 1) — (Gold Star, ex, Lv.X)", val: 200.00, weight: 5 },
             { rawString: "Metagross (Gen 3) — (Gold Star, ex, GX)", val: 260.00, weight: 5 },
             { rawString: "Greninja (Gen 6) — (Tera ex, Twilight Masquerade SIR, GX)", val: 280.00, weight: 8 },
             { rawString: "Sylveon (Gen 6) — (VMAX, Evolving Skies Alt Art, GX)", val: 220.00, weight: 8 },
@@ -432,7 +433,6 @@
             "Reshiram & Charizard GX", "Gengar & Mimikyu GX"
         ];
 
-        // ETB EXCLUSIVE PROMOS POOL (Umbreon/Darkrai & Espeon/Deoxys removed)
         const ETB_PROMOS = [
             { rawString: "Charizard Promo (Gen 1) — (Promo Holo)", val: 35.00 },
             { rawString: "Pikachu Promo (Gen 1) — (Promo Holo)", val: 30.00 },
@@ -594,7 +594,6 @@
         function setupNextPack() {
             currentPackCards = generateSinglePack();
             
-            // If it's an ETB opening on the first pack, include the guaranteed Promo card!
             if (activeProduct.isETB && activeProduct.packsLeft === activeProduct.totalPacks) {
                 currentPackCards.push(generateETBPromoCard());
             }
@@ -638,7 +637,6 @@
                 currentPackCards.push(fullPack[9]);
             }
 
-            // Include promo if ETB hits-only stack
             if (activeProduct.isETB) {
                 currentPackCards.push(generateETBPromoCard());
             }
@@ -733,18 +731,18 @@
             return pack;
         }
 
-        // GENERATE ETB PROMO CARD WITH 1% POKEMON CENTER STAMP CHANCE
         function generateETBPromoCard() {
             let promoItem = ETB_PROMOS[Math.floor(Math.random() * ETB_PROMOS.length)];
-            let hasStamp = Math.random() <= 0.01; // 1% Stamp Chance!
-            let finalVal = hasStamp ? promoItem.val * 3.5 : promoItem.val; // Stamp makes it worth much more!
+            let hasStamp = Math.random() <= 0.01; 
+            let finalVal = hasStamp ? promoItem.val * 3.5 : promoItem.val; 
             return createCard(promoItem.rawString, 'HeavyHit', finalVal, hasStamp);
         }
 
+        // --- RE-CALIBRATED LAST CARD SLOT ODDS ---
         function rollLastCardHitSlot() {
             let roll = Math.random() * 100;
 
-            if (roll <= 12.0) { 
+            if (roll <= 5.0) { // Reduced to 5% Chance for Chase
                 let subRoll = Math.random() * 100;
 
                 if (subRoll <= 1.0) {
@@ -762,7 +760,7 @@
                     let item = TIER_4_CHASE_STANDARD[Math.floor(Math.random() * TIER_4_CHASE_STANDARD.length)];
                     return createCard(item.rawString, 'Chase', item.val);
                 }
-            } else if (roll <= 45.0) { 
+            } else if (roll <= 25.0) { // Reduced to 20% Chance for Heavy Hit (5% to 25%)
                 let totalWeight = TIER_3_HEAVY_LIST.reduce((acc, c) => acc + (c.weight || 10), 0);
                 let randomWeight = Math.random() * totalWeight;
                 let currentSum = 0;
@@ -776,7 +774,7 @@
                     }
                 }
                 return createCard(selectedItem.rawString, 'HeavyHit', selectedItem.val);
-            } else { 
+            } else { // 75% Chance for Filler / Bulk on the last card
                 let item = TIER_2_FILLER_LIST[Math.floor(Math.random() * TIER_2_FILLER_LIST.length)];
                 return createCard(item.rawString, 'Filler', item.val);
             }
