@@ -315,14 +315,14 @@
                         <strong>Penny Sleeves (Pack of 10)</strong>
                         <div style="font-size:12px; color:#aaa;">Owned: <span id="sleeveCount">0</span> | Prevents bad grade rolls (min PSA 9.0)</div>
                     </div>
-                    <button onclick="buySupplies('sleeve', 0.50)">Buy $0.50</button>
+                    <button onclick="buySupplies('sleeve', 20.00)">Buy $20.00</button>
                 </div>
                 <div class="market-item">
                     <div>
                         <strong>Hard Toploaders (Pack of 20)</strong>
-                        <div style="font-size:12px; color:#aaa;">Owned: <span id="toploaderCount">0</span> | Boosts PSA 10 rate to 60%!</div>
+                        <div style="font-size:12px; color:#aaa;">Owned: <span id="toploaderCount">0</span> | Boosts PSA 10 rate to 50%!</div>
                     </div>
-                    <button onclick="buySupplies('toploader', 2.00)">Buy $2.00</button>
+                    <button onclick="buySupplies('toploader', 50.00)">Buy $50.00</button>
                 </div>
             </div>
 
@@ -430,6 +430,48 @@
             "Tarountula (Gen 9) — (Standard)"
         ];
 
+        const UNCOMMONS = [
+            "Zubat (Gen 1) — (Standard Holo)", "Yungoos (Gen 7) — (Standard Holo)",
+            "Patrat (Gen 5) — (Standard Holo)", "Trubbish (Gen 5) — (Standard Holo)",
+            "Greedent (Gen 8) — (Uncommon Holo)", "Bidoof (Gen 4) — (Standard Holo)"
+        ];
+
+        // VINTAGE 1999 BASE SET CARDS (ORIGINAL 151 POKEMON ONLY)
+        const VINTAGE_COMMONS = [
+            "Bulbasaur #44/102 (Gen 1) — (Base Set)", "Charmander #46/102 (Gen 1) — (Base Set)",
+            "Squirtle #63/102 (Gen 1) — (Base Set)", "Caterpie #45/102 (Gen 1) — (Base Set)",
+            "Diglett #47/102 (Gen 1) — (Base Set)", "Drowzee #49/102 (Gen 1) — (Base Set)",
+            "Gastly #50/102 (Gen 1) — (Base Set)", "Machop #52/102 (Gen 1) — (Base Set)",
+            "Pikachu #58/102 (Gen 1) — (Base Set)", "Rattata #61/102 (Gen 1) — (Base Set)"
+        ];
+
+        const VINTAGE_UNCOMMONS = [
+            "Arcanine #23/102 (Gen 1) — (Base Set)", "Charmeleon #24/102 (Gen 1) — (Base Set)",
+            "Haunter #29/102 (Gen 1) — (Base Set)", "Ivysaur #30/102 (Gen 1) — (Base Set)",
+            "Kadabra #32/102 (Gen 1) — (Base Set)", "Machoke #34/102 (Gen 1) — (Base Set)",
+            "Porygon #39/102 (Gen 1) — (Base Set)", "Wartortle #42/102 (Gen 1) — (Base Set)"
+        ];
+
+        // 16 BASE SET HOLOS ORDERED FROM LEAST EXPENSIVE TO MOST EXPENSIVE
+        const VINTAGE_BASE_HOLOS_SORTED = [
+            { rawString: "Hitmonchan 7/102 (Gen 1) — (Base Set Holo)", val: 17.50 },
+            { rawString: "Magneton 9/102 (Gen 1) — (Base Set Holo)", val: 33.00 },
+            { rawString: "Poliwrath 13/102 (Gen 1) — (Base Set Holo)", val: 35.00 },
+            { rawString: "Nidoking 11/102 (Gen 1) — (Base Set Holo)", val: 38.00 },
+            { rawString: "Ninetales 12/102 (Gen 1) — (Base Set Holo)", val: 42.00 },
+            { rawString: "Zapdos 16/102 (Gen 1) — (Base Set Holo)", val: 47.00 },
+            { rawString: "Clefairy 5/102 (Gen 1) — (Base Set Holo)", val: 48.00 },
+            { rawString: "Gyarados 6/102 (Gen 1) — (Base Set Holo)", val: 49.00 },
+            { rawString: "Machamp 8/102 (Gen 1) — (Base Set Holo)", val: 50.00 },
+            { rawString: "Chansey 3/102 (Gen 1) — (Base Set Holo)", val: 56.00 },
+            { rawString: "Raichu 14/102 (Gen 1) — (Base Set Holo)", val: 64.00 },
+            { rawString: "Alakazam 1/102 (Gen 1) — (Base Set Holo)", val: 70.00 },
+            { rawString: "Mewtwo 10/102 (Gen 1) — (Base Set Holo)", val: 86.00 },
+            { rawString: "Venusaur 15/102 (Gen 1) — (Base Set Holo)", val: 170.00 },
+            { rawString: "Blastoise 2/102 (Gen 1) — (Base Set Holo)", val: 225.00 },
+            { rawString: "Charizard 4/102 (Gen 1) — (Base Set Holo)", val: 925.00 }
+        ];
+
         const TIER_1_BULK_LIST = [
             { rawString: "Zubat (Gen 1) — (Standard Holo)", val: 1.50 },
             { rawString: "Yungoos (Gen 7) — (Standard Holo)", val: 1.50 },
@@ -470,14 +512,6 @@
             { rawString: "Roaring Moon (Gen 9) — (Ancient ex SIR)", val: 180.00 },
             { rawString: "Giratina (Gen 4) — (GX, VSTAR, Alt Art)", val: 280.00 },
             { rawString: "Lugia (Gen 2) — (LEGEND, VSTAR, Alt Art)", val: 350.00 }
-        ];
-
-        const VINTAGE_GRAILS = [
-            { rawString: "Charizard (Gen 1) — (1st Edition Shadowless Base Set Holo)", val: 1800.00 },
-            { rawString: "Blastoise (Gen 1) — (1st Edition Shadowless Base Set Holo)", val: 900.00 },
-            { rawString: "Venusaur (Gen 1) — (1st Edition Shadowless Base Set Holo)", val: 750.00 },
-            { rawString: "Lugia (Gen 2) — (1st Edition Neo Genesis Holo)", val: 1200.00 },
-            { rawString: "Shining Charizard (Gen 2) — (Neo Destiny Secret Holo)", val: 1400.00 }
         ];
 
         const ETB_PROMOS = [
@@ -807,34 +841,44 @@
         function generateSinglePack(isVintage = false) {
             let pack = [];
 
+            // 0.05% GOD PACK CHANCE (1 in 2000 packs)
             let isGodPack = Math.random() <= 0.0005; 
 
             if (isGodPack) {
                 alert("🌟 GOD PACK UNLOCKED! ALL 10 CARDS ARE HEAVY HITS OR CHASE CARDS!");
                 for (let i = 0; i < 10; i++) {
-                    pack.push(rollLastCardHitSlot(isVintage));
+                    pack.push(rollLastCardHitSlot(isVintage, true));
                 }
+                // SORT GOD PACK LEAST TO GREATEST COST (BASE VALUE)
+                pack.sort((a, b) => a.baseValue - b.baseValue);
                 return pack;
             }
 
             if (isVintage) {
-                for (let i = 0; i < 6; i++) pack.push(createCard("Vintage Common (Gen 1) — (Base Set)", 'Common', 8.00));
-                for (let i = 0; i < 3; i++) pack.push(createCard("Vintage Uncommon (Gen 1) — (Base Set)", 'Uncommon', 18.00));
+                // Strictly 1999 Base Set Pokémon cards (151 First Gen Only)
+                for (let i = 0; i < 6; i++) {
+                    pack.push(createCard(VINTAGE_COMMONS[Math.floor(Math.random() * VINTAGE_COMMONS.length)], 'Common', 2.00));
+                }
+                for (let i = 0; i < 3; i++) {
+                    pack.push(createCard(VINTAGE_UNCOMMONS[Math.floor(Math.random() * VINTAGE_UNCOMMONS.length)], 'Uncommon', 5.00));
+                }
                 
-                let isVintageHoloHit = Math.random() <= 0.05; 
+                // 1 in 3 chance for Base Set Holo Hit
+                let isVintageHoloHit = Math.random() <= 0.333; 
 
                 if (isVintageHoloHit) {
-                    let grail = VINTAGE_GRAILS[Math.floor(Math.random() * VINTAGE_GRAILS.length)];
-                    pack.push(createCard(grail.rawString, 'Chase', grail.val));
+                    // Pick a random Base Set Holo from the 16 Holos
+                    let holo = VINTAGE_BASE_HOLOS_SORTED[Math.floor(Math.random() * VINTAGE_BASE_HOLOS_SORTED.length)];
+                    pack.push(createCard(holo.rawString, 'Chase', holo.val));
                 } else {
-                    pack.push(createCard("Vintage Rare Non-Holo (Gen 1) — (Base Set)", 'Rare', 25.00));
+                    pack.push(createCard("Beedrill #17/102 (Gen 1) — (Base Set Rare)", 'Rare', 12.00));
                 }
                 return pack;
             }
 
-            for (let i = 0; i < 4; i++) pack.push(createCard(COMMONS[Math.floor(Math.random() * COMMONS.length)], 'Common', 0.50));
-            for (let i = 0; i < 3; i++) pack.push(createCard(COMMONS[Math.floor(Math.random() * COMMONS.length)], 'Uncommon', 1.50));
-            pack.push(createCard(COMMONS[Math.floor(Math.random() * COMMONS.length)], 'Rare', 3.00));
+            // Standard Packs
+            for (let i = 0; i < 5; i++) pack.push(createCard(COMMONS[Math.floor(Math.random() * COMMONS.length)], 'Common', 0.50));
+            for (let i = 0; i < 3; i++) pack.push(createCard(UNCOMMONS[Math.floor(Math.random() * UNCOMMONS.length)], 'Uncommon', 1.50));
             
             let bulkItem = TIER_1_BULK_LIST[Math.floor(Math.random() * TIER_1_BULK_LIST.length)];
             pack.push(createCard(bulkItem.rawString, 'Bulk', bulkItem.val));
@@ -862,42 +906,66 @@
             return createCard(selectedPromo.rawString, 'HeavyHit', finalVal, hasStamp);
         }
 
-        function rollLastCardHitSlot(isVintage = false) {
+        function rollLastCardHitSlot(isVintage = false, forceGodPack = false) {
+            if (forceGodPack) {
+                let roll = Math.random() * 100;
+                if (roll <= 30.0) { 
+                    return rollChaseCard();
+                } else { 
+                    return rollHeavyHitCard();
+                }
+            }
+
+            // Hit rates: Common 50%, Uncommon 34.3%, Filler 10%, Heavy 5%, Chase 0.7%
             let roll = Math.random() * 100;
 
-            if (roll <= 5.0) { 
-                let subRoll = Math.random() * 100;
-
-                if (subRoll <= 1.0) {
-                    stats.moonbreonsPulled++;
-                    checkAchievements();
-                    return createCard("Umbreon (Gen 2) — (Gold Star, Moonbreon Alt Art)", 'Chase', 850.00);
-                } else if (subRoll <= 3.0) {
-                    return createCard("Charizard (Gen 1) — (Base Set Holo, GX, VMAX, Tera ex)", 'Chase', 350.00);
-                } else if (subRoll <= 5.0) {
-                    return createCard("Pikachu (Gen 1) — (VMAX, VSTAR, Stellar Tera ex)", 'Chase', 320.00);
-                } else {
-                    let item = TIER_4_CHASE_STANDARD[Math.floor(Math.random() * TIER_4_CHASE_STANDARD.length)];
-                    return createCard(item.rawString, 'Chase', item.val);
-                }
-            } else if (roll <= 25.0) { 
-                let totalWeight = TIER_3_HEAVY_LIST.reduce((acc, c) => acc + (c.weight || 10), 0);
-                let randomWeight = Math.random() * totalWeight;
-                let currentSum = 0;
-                let selectedItem = TIER_3_HEAVY_LIST[0];
-
-                for (let item of TIER_3_HEAVY_LIST) {
-                    currentSum += (item.weight || 10);
-                    if (randomWeight <= currentSum) {
-                        selectedItem = item;
-                        break;
-                    }
-                }
-                return createCard(selectedItem.rawString, 'HeavyHit', selectedItem.val);
-            } else { 
+            if (roll <= 0.7) { 
+                return rollChaseCard();
+            } else if (roll <= 5.7) { 
+                return rollHeavyHitCard();
+            } else if (roll <= 15.7) { 
                 let item = TIER_2_FILLER_LIST[Math.floor(Math.random() * TIER_2_FILLER_LIST.length)];
                 return createCard(item.rawString, 'Filler', item.val);
+            } else if (roll <= 50.0) { 
+                let rawStr = UNCOMMONS[Math.floor(Math.random() * UNCOMMONS.length)];
+                return createCard(rawStr, 'Uncommon', 1.50);
+            } else { 
+                let rawStr = COMMONS[Math.floor(Math.random() * COMMONS.length)];
+                return createCard(rawStr, 'Common', 0.50);
             }
+        }
+
+        function rollChaseCard() {
+            let subRoll = Math.random() * 100;
+
+            if (subRoll <= 10.0) { 
+                stats.moonbreonsPulled++;
+                checkAchievements();
+                return createCard("Umbreon (Gen 2) — (Gold Star, Moonbreon Alt Art)", 'Chase', 850.00);
+            } else if (subRoll <= 30.0) { 
+                return createCard("Charizard (Gen 1) — (Base Set Holo, GX, VMAX, Tera ex)", 'Chase', 350.00);
+            } else if (subRoll <= 50.0) { 
+                return createCard("Pikachu (Gen 1) — (VMAX, VSTAR, Stellar Tera ex)", 'Chase', 320.00);
+            } else { 
+                let item = TIER_4_CHASE_STANDARD[Math.floor(Math.random() * TIER_4_CHASE_STANDARD.length)];
+                return createCard(item.rawString, 'Chase', item.val);
+            }
+        }
+
+        function rollHeavyHitCard() {
+            let totalWeight = TIER_3_HEAVY_LIST.reduce((acc, c) => acc + (c.weight || 10), 0);
+            let randomWeight = Math.random() * totalWeight;
+            let currentSum = 0;
+            let selectedItem = TIER_3_HEAVY_LIST[0];
+
+            for (let item of TIER_3_HEAVY_LIST) {
+                currentSum += (item.weight || 10);
+                if (randomWeight <= currentSum) {
+                    selectedItem = item;
+                    break;
+                }
+            }
+            return createCard(selectedItem.rawString, 'HeavyHit', selectedItem.val);
         }
 
         function createCard(rawString, tier, baseVal, hasStamp = false) {
@@ -1124,6 +1192,7 @@
             }
         }
 
+        // UPDATED GRADING ODDS LOGIC (+10% TOPLOADER BOOST AND REBALANCED BLACK LABELS)
         function gradeCard(cardId) {
             let card = inventory.find(c => c.id == cardId);
             if (!card) return;
@@ -1142,27 +1211,29 @@
             cash -= fee;
 
             let roll = Math.random() * 100;
-            let finalGrade = 10;
+            let finalGrade = 10.0;
             let isBlackLabel = false;
 
             if (card.protection === 'toploader') {
-                if (roll <= 60.0) {
+                // Toploader increases PSA 10 chance by +10% over base (40% base -> 50% max)
+                if (roll <= 50.0) {
                     finalGrade = 10.0;
-                    if (company === 'Beckett' && Math.random() <= 0.25) isBlackLabel = true;
+                    if (company === 'Beckett' && Math.random() <= 0.05) isBlackLabel = true; // 5% Black Label chance
                 } else {
                     finalGrade = 9.5;
                 }
             } else if (card.protection === 'sleeve') {
-                if (roll <= 50.0) {
+                if (roll <= 45.0) {
                     finalGrade = 10.0;
-                    if (company === 'Beckett' && Math.random() <= 0.20) isBlackLabel = true;
+                    if (company === 'Beckett' && Math.random() <= 0.03) isBlackLabel = true; // 3% Black Label chance
                 } else {
                     finalGrade = 9.0;
                 }
             } else {
+                // Raw / Unprotected cards
                 if (roll <= 40.0) {
                     finalGrade = 10.0;
-                    if (company === 'Beckett' && Math.random() <= 0.15) isBlackLabel = true;
+                    if (company === 'Beckett' && Math.random() <= 0.01) isBlackLabel = true; // 1% Black Label chance
                 } else if (roll <= 75.0) {
                     finalGrade = 9.0;
                 } else {
