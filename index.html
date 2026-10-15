@@ -323,14 +323,14 @@
                 <h3 style="margin-top: 20px; font-size: 15px; color: #00ffcc;">🛡️ Protective Supplies</h3>
                 <div class="market-item">
                     <div>
-                        <strong>Penny Sleeves (Pack of 10)</strong>
-                        <div style="font-size:12px; color:#aaa;">Owned: <span id="sleeveCount">0</span> | Prevents bad grade rolls (min PSA 9.0)</div>
+                        <strong>Penny Sleeve (Single)</strong>
+                        <div style="font-size:12px; color:#aaa;">Owned: <span id="sleeveCount">0</span> | Basic protection for raw cards</div>
                     </div>
-                    <button onclick="buySupplies('sleeve', 20.00)">Buy $20.00</button>
+                    <button onclick="buySupplies('sleeve', 50.00)">Buy $50.00</button>
                 </div>
                 <div class="market-item">
                     <div>
-                        <strong>Hard Toploaders (Pack of 20)</strong>
+                        <strong>Hard Toploader (Single)</strong>
                         <div style="font-size:12px; color:#aaa;">Owned: <span id="toploaderCount">0</span> | Sets PSA 10 rate to 35%!</div>
                     </div>
                     <button onclick="buySupplies('toploader', 50.00)">Buy $50.00</button>
@@ -411,6 +411,7 @@
         let currentCardIndex = 0;
         let isAllFlipped = false;
         let currentOpeningMode = 'regular';
+        let isPromoOpeningPhase = false;
         
         let sleevesCount = 0;
         let toploadersCount = 0;
@@ -447,7 +448,7 @@
             "Greedent (Gen 8) — (Uncommon Holo)", "Bidoof (Gen 4) — (Standard Holo)"
         ];
 
-        // 1999 BASE SET CARD POOLS
+        // 1999 BASE SET POOLS
         const VINTAGE_COMMONS = [
             "Bulbasaur #44/102 (Gen 1) — (Base Set)", "Charmander #46/102 (Gen 1) — (Base Set)",
             "Squirtle #63/102 (Gen 1) — (Base Set)", "Caterpie #45/102 (Gen 1) — (Base Set)",
@@ -634,11 +635,12 @@
             return { name, gen, type };
         }
 
+        // UPDATED: $50 FOR SINGLE TOPLOADER / SLEEVE
         function buySupplies(type, cost) {
             if (cash < cost) { alert("Not enough cash!"); return; }
             cash -= cost;
-            if (type === 'sleeve') sleevesCount += 10;
-            if (type === 'toploader') toploadersCount += 20;
+            if (type === 'sleeve') sleevesCount += 1;
+            if (type === 'toploader') toploadersCount += 1;
             updateUI();
         }
 
@@ -733,22 +735,42 @@
             } else if (mode === 'hits') {
                 setupHitsOnlyStack();
             } else {
-                setupNextPack();
+                // Separate ETB promo opening into distinct step
+                if (activeProduct.isETB) {
+                    setupETBPromoOpening();
+                } else {
+                    setupNextPack();
+                }
             }
             updateUI();
         }
 
+        function setupETBPromoOpening() {
+            isPromoOpeningPhase = true;
+            let promoCard = generateETBPromoCard();
+            promoCard.isETBPromo = true;
+            currentPackCards = [promoCard];
+
+            currentCardIndex = 0;
+            isAllFlipped = false;
+
+            document.getElementById('packGraphic').style.display = 'none';
+            document.getElementById('boosterBoxGraphic').style.display = 'none';
+            
+            let etbG = document.getElementById('etbGraphic');
+            etbG.style.display = 'flex';
+            etbG.classList.remove('opening');
+
+            document.getElementById('cardStack').style.display = 'none';
+            document.getElementById('cardStack').innerHTML = '';
+            document.getElementById('packControls').style.display = 'none';
+            document.getElementById('packInstruction').style.display = 'none';
+            document.getElementById('packStageTitle').innerText = `🎁 Opening ETB! Click Lid to Claim Guaranteed Promo Card!`;
+        }
+
         function setupNextPack() {
-            currentPackCards = [];
-
-            if (activeProduct.isETB && activeProduct.packsLeft === activeProduct.totalPacks) {
-                let promoCard = generateETBPromoCard();
-                promoCard.isETBPromo = true;
-                currentPackCards.push(promoCard);
-            }
-
-            let packCards = generateSinglePack(activeProduct.isVintage);
-            currentPackCards.push(...packCards);
+            isPromoOpeningPhase = false;
+            currentPackCards = generateSinglePack(activeProduct.isVintage);
 
             currentCardIndex = 0;
             isAllFlipped = false;
@@ -882,16 +904,13 @@
             }
 
             if (isVintage) {
-                // Generate 6 Base Set Commons
                 for (let i = 0; i < 6; i++) {
                     pack.push(createCard(VINTAGE_COMMONS[Math.floor(Math.random() * VINTAGE_COMMONS.length)], 'Common', 2.00));
                 }
-                // Generate 3 Base Set Uncommons
                 for (let i = 0; i < 3; i++) {
                     pack.push(createCard(VINTAGE_UNCOMMONS[Math.floor(Math.random() * VINTAGE_UNCOMMONS.length)], 'Uncommon', 5.00));
                 }
                 
-                // Card 10: 33.3% chance for Holo, otherwise Non-Holo Rare
                 let isVintageHoloHit = Math.random() <= 0.333; 
 
                 if (isVintageHoloHit) {
@@ -904,7 +923,6 @@
                 return pack;
             }
 
-            // Modern Packs
             for (let i = 0; i < 5; i++) pack.push(createCard(COMMONS[Math.floor(Math.random() * COMMONS.length)], 'Common', 0.50));
             for (let i = 0; i < 3; i++) pack.push(createCard(UNCOMMONS[Math.floor(Math.random() * UNCOMMONS.length)], 'Uncommon', 1.50));
             
@@ -1034,7 +1052,7 @@
             let activeGraphic = null;
             let duration = 750;
 
-            if (activeProduct.totalPacks === 8) {
+            if (activeProduct.totalPacks === 8 && isPromoOpeningPhase) {
                 activeGraphic = document.getElementById('etbGraphic');
                 activeGraphic.classList.add('opening');
                 duration = 900;
@@ -1061,11 +1079,9 @@
             document.getElementById('packControls').style.display = 'block';
             document.getElementById('packInstruction').style.display = 'block';
             
-            let hasPromoOnTop = currentPackCards[0] && currentPackCards[0].isETBPromo;
-            
-            if (hasPromoOnTop) {
-                document.getElementById('packStageTitle').innerText = `🎁 Guaranteed ETB Promo Card Revealed First!`;
-                document.getElementById('packInstruction').innerText = `Click "Flip Cards" to reveal your guaranteed promo before starting pack 1!`;
+            if (isPromoOpeningPhase) {
+                document.getElementById('packStageTitle').innerText = `🎁 Guaranteed ETB Promo Card Revealed!`;
+                document.getElementById('packInstruction').innerText = `Click "Flip Cards" to reveal your guaranteed promo before opening pack 1!`;
             } else {
                 document.getElementById('packStageTitle').innerText = currentOpeningMode === 'hits' 
                     ? `🔥 Hits Only Stack (${currentPackCards.length} Total Cards)`
@@ -1138,6 +1154,16 @@
             if (currentCardIndex < currentPackCards.length) {
                 document.getElementById('packStageTitle').innerText = `Card ${currentCardIndex + 1} of ${currentPackCards.length} Revealed! Click to slide UP.`;
             } else {
+                if (isPromoOpeningPhase) {
+                    isPromoOpeningPhase = false;
+                    document.getElementById('packStageTitle').innerText = `🎉 Promo Claimed! Ready to open Pack 1 of 8!`;
+                    document.getElementById('packControls').style.display = 'block';
+                    document.getElementById('actionBtn').innerText = "Open First Pack ➡️";
+                    document.getElementById('actionBtn').onclick = setupNextPack;
+                    document.getElementById('packInstruction').style.display = 'none';
+                    return;
+                }
+
                 if (currentOpeningMode === 'regular') {
                     activeProduct.packsLeft--;
                 } else {
