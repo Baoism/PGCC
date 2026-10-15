@@ -323,14 +323,14 @@
                 <h3 style="margin-top: 20px; font-size: 15px; color: #00ffcc;">🛡️ Protective Supplies</h3>
                 <div class="market-item">
                     <div>
-                        <strong>Penny Sleeve (Single)</strong>
-                        <div style="font-size:12px; color:#aaa;">Owned: <span id="sleeveCount">0</span> | Basic protection for raw cards</div>
+                        <strong>Penny Sleeve (1x)</strong>
+                        <div style="font-size:12px; color:#aaa;">Owned: <span id="sleeveCount">0</span> | Basic card protection</div>
                     </div>
                     <button onclick="buySupplies('sleeve', 50.00)">Buy $50.00</button>
                 </div>
                 <div class="market-item">
                     <div>
-                        <strong>Hard Toploader (Single)</strong>
+                        <strong>Hard Toploader (1x)</strong>
                         <div style="font-size:12px; color:#aaa;">Owned: <span id="toploaderCount">0</span> | Sets PSA 10 rate to 35%!</div>
                     </div>
                     <button onclick="buySupplies('toploader', 50.00)">Buy $50.00</button>
@@ -448,7 +448,7 @@
             "Greedent (Gen 8) — (Uncommon Holo)", "Bidoof (Gen 4) — (Standard Holo)"
         ];
 
-        // 1999 BASE SET POOLS
+        // 1999 BASE SET CARD POOLS
         const VINTAGE_COMMONS = [
             "Bulbasaur #44/102 (Gen 1) — (Base Set)", "Charmander #46/102 (Gen 1) — (Base Set)",
             "Squirtle #63/102 (Gen 1) — (Base Set)", "Caterpie #45/102 (Gen 1) — (Base Set)",
@@ -635,7 +635,7 @@
             return { name, gen, type };
         }
 
-        // UPDATED: $50 FOR SINGLE TOPLOADER / SLEEVE
+        // FIXED: single supplies for $50.00
         function buySupplies(type, cost) {
             if (cash < cost) { alert("Not enough cash!"); return; }
             cash -= cost;
@@ -644,8 +644,9 @@
             updateUI();
         }
 
+        // FIXED: String vs Number loose equality comparison bug for card.id
         function applyProtection(cardId, protectionType) {
-            let card = inventory.find(c => c.id == cardId);
+            let card = inventory.find(c => String(c.id) === String(cardId));
             if (!card) return;
 
             if (protectionType === 'sleeve') {
@@ -735,7 +736,6 @@
             } else if (mode === 'hits') {
                 setupHitsOnlyStack();
             } else {
-                // Separate ETB promo opening into distinct step
                 if (activeProduct.isETB) {
                     setupETBPromoOpening();
                 } else {
@@ -868,7 +868,7 @@
             updateUI();
 
             allPulledCards.forEach(card => {
-                let isHit = (card.tier === 'Chase' || card.tier === 'HeavyHit' || card.tier === 'Filler' || card.isETBPromo);
+                let isHit = (card.tier === 'Chase' || card.tier === 'HeavyHit' || card.tier === 'Filler' || card.tier === 'Rare' || card.isETBPromo);
                 html += `
                     <div class="open-all-card ${isHit ? 'is-hit' : ''}">
                         <div class="card-type-top">${card.selectedType}</div>
@@ -1250,7 +1250,7 @@
         }
 
         function sellCard(cardId) {
-            let idx = inventory.findIndex(c => c.id == cardId);
+            let idx = inventory.findIndex(c => String(c.id) === String(cardId));
             if (idx === -1) return;
             let card = inventory[idx];
             
@@ -1265,7 +1265,7 @@
         }
 
         function gradeCard(cardId) {
-            let card = inventory.find(c => c.id == cardId);
+            let card = inventory.find(c => String(c.id) === String(cardId));
             if (!card) return;
 
             let fee = getGradingFee(card.baseValue);
