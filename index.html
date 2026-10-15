@@ -145,6 +145,17 @@
             transition: transform 0.6s ease, opacity 0.5s ease;
         }
 
+        .physical-card.is-promo-card {
+            box-shadow: 0 0 20px #f72585, 0 0 35px #8e2de2;
+            border: 2px solid #ffd700 !important;
+            animation: promoGlowPulse 1.5s infinite alternate;
+        }
+
+        @keyframes promoGlowPulse {
+            0% { transform: scale(1); box-shadow: 0 0 15px #f72585; }
+            100% { transform: scale(1.03); box-shadow: 0 0 30px #ffd700; }
+        }
+
         .physical-card-inner {
             width: 100%; height: 100%; position: relative;
             transform-style: preserve-3d; transition: transform 0.6s ease-in-out;
@@ -263,9 +274,34 @@
             border-color: #ffd700;
             background: #2e2610;
         }
+
+        .grail-banner {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #000;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.8), 0 0 50px rgba(255, 140, 0, 0.5);
+            border: 2px solid #fff;
+            z-index: 9999;
+            transition: top 0.5s ease-in-out;
+            text-align: center;
+        }
+        .grail-banner.show {
+            top: 20px;
+        }
     </style>
 </head>
 <body>
+
+    <div id="grailBanner" class="grail-banner">
+        🌌 GRAIL UNLOCKED! You pulled Moonbreon! (+ Special Gold Status)
+    </div>
 
     <div class="header">
         <div>
@@ -287,11 +323,17 @@
                 <h3 style="margin-top: 20px; font-size: 15px; color: #00ffcc;">🛡️ Protective Supplies</h3>
                 <div class="market-item">
                     <div>
-                        <strong>Protective Supply Bundle</strong>
-                        <div style="font-size:12px; color:#aaa;">Sleeves: <span id="sleeveCount">0</span> | Toploaders: <span id="toploaderCount">0</span></div>
-                        <div style="font-size:11px; color:#888;">Includes 1 Penny Sleeve & 1 Hard Toploader</div>
+                        <strong>Penny Sleeves (Pack of 10)</strong>
+                        <div style="font-size:12px; color:#aaa;">Owned: <span id="sleeveCount">0</span> | Prevents bad grade rolls (min PSA 9.0)</div>
                     </div>
-                    <button onclick="buySupplyBundle()">Buy $50.00</button>
+                    <button onclick="buySupplies('sleeve', 20.00)">Buy $20.00</button>
+                </div>
+                <div class="market-item">
+                    <div>
+                        <strong>Hard Toploaders (Pack of 20)</strong>
+                        <div style="font-size:12px; color:#aaa;">Owned: <span id="toploaderCount">0</span> | Sets PSA 10 rate to 35%!</div>
+                    </div>
+                    <button onclick="buySupplies('toploader', 50.00)">Buy $50.00</button>
                 </div>
             </div>
 
@@ -308,7 +350,7 @@
 
                     <div id="etbGraphic" class="etb-wrapper" style="display:none;" onclick="startRipAnimation()">
                         <div style="font-size: 18px;">🎁 ELITE TRAINER BOX</div>
-                        <div style="font-size: 12px; color: #f72585; margin-top: 6px;">Contains 8 Booster Packs + Promo</div>
+                        <div style="font-size: 12px; color: #f72585; margin-top: 6px;">Contains 8 Booster Packs + Guaranteed Promo</div>
                         <div style="font-size: 11px; color: #aaa; margin-top: 12px;">(Click to Lift Box Lid 📦)</div>
                     </div>
 
@@ -386,6 +428,8 @@
             { id: 'moonbreon_grail', name: '🌌 Grail Hunter', desc: 'Pull a Moonbreon Alt Art card', reward: 500, unlocked: false }
         ];
 
+        const RARITY_RANK = { 'Chase': 6, 'HeavyHit': 5, 'Filler': 4, 'Bulk': 3, 'Rare': 2, 'Uncommon': 1, 'Common': 0 };
+
         const COMMONS = [
             "Pidgey (Gen 1) — (Standard)", "Rattata (Gen 1) — (Standard)", "Caterpie (Gen 1) — (Standard)", 
             "Weedle (Gen 1) — (Standard)", "Metapod (Gen 1) — (Standard)", "Hoothoot (Gen 2) — (Standard)", 
@@ -395,6 +439,56 @@
             "Patrat (Gen 5) — (Standard)", "Sewaddle (Gen 5) — (Standard)", "Bunnelby (Gen 6) — (Standard)", 
             "Fletchling (Gen 6) — (Standard)", "Yungoos (Gen 7) — (Standard)", "Skwovet (Gen 8) — (Standard)", 
             "Tarountula (Gen 9) — (Standard)"
+        ];
+
+        const UNCOMMONS = [
+            "Zubat (Gen 1) — (Standard Holo)", "Yungoos (Gen 7) — (Standard Holo)",
+            "Patrat (Gen 5) — (Standard Holo)", "Trubbish (Gen 5) — (Standard Holo)",
+            "Greedent (Gen 8) — (Uncommon Holo)", "Bidoof (Gen 4) — (Standard Holo)"
+        ];
+
+        // 1999 BASE SET CARD POOLS
+        const VINTAGE_COMMONS = [
+            "Bulbasaur #44/102 (Gen 1) — (Base Set)", "Charmander #46/102 (Gen 1) — (Base Set)",
+            "Squirtle #63/102 (Gen 1) — (Base Set)", "Caterpie #45/102 (Gen 1) — (Base Set)",
+            "Diglett #47/102 (Gen 1) — (Base Set)", "Drowzee #49/102 (Gen 1) — (Base Set)",
+            "Gastly #50/102 (Gen 1) — (Base Set)", "Machop #52/102 (Gen 1) — (Base Set)",
+            "Pikachu #58/102 (Gen 1) — (Base Set)", "Rattata #61/102 (Gen 1) — (Base Set)"
+        ];
+
+        const VINTAGE_UNCOMMONS = [
+            "Arcanine #23/102 (Gen 1) — (Base Set)", "Charmeleon #24/102 (Gen 1) — (Base Set)",
+            "Haunter #29/102 (Gen 1) — (Base Set)", "Ivysaur #30/102 (Gen 1) — (Base Set)",
+            "Kadabra #32/102 (Gen 1) — (Base Set)", "Machoke #34/102 (Gen 1) — (Base Set)",
+            "Porygon #39/102 (Gen 1) — (Base Set)", "Wartortle #42/102 (Gen 1) — (Base Set)"
+        ];
+
+        const VINTAGE_NONHOLO_RARES = [
+            { rawString: "Beedrill #17/102 (Gen 1) — (Base Set Rare)", val: 6.00 },
+            { rawString: "Dragonair #18/102 (Gen 1) — (Base Set Rare)", val: 18.00 },
+            { rawString: "Dugtrio #19/102 (Gen 1) — (Base Set Rare)", val: 11.00 },
+            { rawString: "Electabuzz #20/102 (Gen 1) — (Base Set Rare)", val: 10.00 },
+            { rawString: "Electrode #21/102 (Gen 1) — (Base Set Rare)", val: 9.00 },
+            { rawString: "Pidgeotto #22/102 (Gen 1) — (Base Set Rare)", val: 9.50 }
+        ];
+
+        const VINTAGE_BASE_HOLOS_SORTED = [
+            { rawString: "Hitmonchan 7/102 (Gen 1) — (Base Set Holo)", val: 17.50 },
+            { rawString: "Magneton 9/102 (Gen 1) — (Base Set Holo)", val: 33.00 },
+            { rawString: "Poliwrath 13/102 (Gen 1) — (Base Set Holo)", val: 35.00 },
+            { rawString: "Nidoking 11/102 (Gen 1) — (Base Set Holo)", val: 38.00 },
+            { rawString: "Ninetales 12/102 (Gen 1) — (Base Set Holo)", val: 42.00 },
+            { rawString: "Zapdos 16/102 (Gen 1) — (Base Set Holo)", val: 47.00 },
+            { rawString: "Clefairy 5/102 (Gen 1) — (Base Set Holo)", val: 48.00 },
+            { rawString: "Gyarados 6/102 (Gen 1) — (Base Set Holo)", val: 49.00 },
+            { rawString: "Machamp 8/102 (Gen 1) — (Base Set Holo)", val: 50.00 },
+            { rawString: "Chansey 3/102 (Gen 1) — (Base Set Holo)", val: 56.00 },
+            { rawString: "Raichu 14/102 (Gen 1) — (Base Set Holo)", val: 64.00 },
+            { rawString: "Alakazam 1/102 (Gen 1) — (Base Set Holo)", val: 70.00 },
+            { rawString: "Mewtwo 10/102 (Gen 1) — (Base Set Holo)", val: 86.00 },
+            { rawString: "Venusaur 15/102 (Gen 1) — (Base Set Holo)", val: 170.00 },
+            { rawString: "Blastoise 2/102 (Gen 1) — (Base Set Holo)", val: 225.00 },
+            { rawString: "Charizard 4/102 (Gen 1) — (Base Set Holo)", val: 925.00 }
         ];
 
         const TIER_1_BULK_LIST = [
@@ -431,52 +525,20 @@
         ];
 
         const TIER_4_CHASE_STANDARD = [
-            { rawString: "Vaporeon (Gen 1) — (VMAX, Premium Promo)", val: 120.00 },
-            { rawString: "Jolteon (Gen 1) — (VMAX, Premium Promo)", val: 120.00 },
-            { rawString: "Flareon (Gen 1) — (VMAX, Premium Promo)", val: 120.00 },
             { rawString: "Roaring Moon (Gen 9) — (Ancient ex SIR)", val: 180.00 },
             { rawString: "Giratina (Gen 4) — (GX, VSTAR, Alt Art)", val: 280.00 },
             { rawString: "Lugia (Gen 2) — (LEGEND, VSTAR, Alt Art)", val: 350.00 }
         ];
 
-        // 1999 VINTAGE BASE SET HOLOS (ORDERED BY LEAST EXPENSIVE TO MOST EXPENSIVE DROP WEIGHT)
-        const VINTAGE_BASE_HOLOS = [
-            { rawString: "Machamp (8/102) (Gen 1) — (1st Edition Base Set Holo)", val: 15.00, weight: 35 },
-            { rawString: "Hitmonchan (7/102) (Gen 1) — (1st Edition Shadowless Holo)", val: 110.00, weight: 30 },
-            { rawString: "Ninetales (12/102) (Gen 1) — (1st Edition Shadowless Holo)", val: 140.00, weight: 26 },
-            { rawString: "Gyarados (6/102) (Gen 1) — (1st Edition Shadowless Holo)", val: 160.00, weight: 24 },
-            { rawString: "Poliwrath (13/102) (Gen 1) — (1st Edition Shadowless Holo)", val: 175.00, weight: 22 },
-            { rawString: "Chansey (3/102) (Gen 1) — (1st Edition Shadowless Holo)", val: 210.00, weight: 20 },
-            { rawString: "Zapdos (16/102) (Gen 1) — (1st Edition Shadowless Holo)", val: 230.00, weight: 18 },
-            { rawString: "Nidoking (11/102) (Gen 1) — (1st Edition Shadowless Holo)", val: 240.00, weight: 16 },
-            { rawString: "Mewtwo (10/102) (Gen 1) — (1st Edition Shadowless Holo)", val: 340.00, weight: 14 },
-            { rawString: "Raichu (14/102) (Gen 1) — (1st Edition Shadowless Holo)", val: 360.00, weight: 12 },
-            { rawString: "Alakazam (1/102) (Gen 1) — (1st Edition Shadowless Holo)", val: 370.00, weight: 10 },
-            { rawString: "Clefairy (5/102) (Gen 1) — (1st Edition Shadowless Holo)", val: 380.00, weight: 8 },
-            { rawString: "Magneton (9/102) (Gen 1) — (1st Edition Shadowless Holo)", val: 400.00, weight: 6 },
-            { rawString: "Venusaur (15/102) (Gen 1) — (1st Edition Shadowless Holo)", val: 1150.00, weight: 4 },
-            { rawString: "Blastoise (2/102) (Gen 1) — (1st Edition Shadowless Holo)", val: 1250.00, weight: 3 },
-            { rawString: "Charizard (4/102) (Gen 1) — (1st Edition Shadowless Holo)", val: 1800.00, weight: 1 }
-        ];
-
-        const VINTAGE_BASE_COMMONS = [
-            "Bulbasaur (44/102) (Gen 1)", "Charmander (46/102) (Gen 1)", "Squirtle (63/102) (Gen 1)",
-            "Caterpie (45/102) (Gen 1)", "Diglett (47/102) (Gen 1)", "Pikachu (58/102) (Gen 1)",
-            "Staryu (65/102) (Gen 1)", "Machop (52/102) (Gen 1)", "Gastly (50/102) (Gen 1)",
-            "Drowzee (49/102) (Gen 1)", "Abra (43/102) (Gen 1)", "Rattata (61/102) (Gen 1)"
-        ];
-
-        const VINTAGE_BASE_UNCOMMONS = [
-            "Haunter (29/102) (Gen 1)", "Ivysaur (30/102) (Gen 1)", "Charmeleon (24/102) (Gen 1)",
-            "Wartortle (42/102) (Gen 1)", "Porygon (39/102) (Gen 1)", "Kadabra (32/102) (Gen 1)",
-            "Machoke (34/102) (Gen 1)", "Magikarp (35/102) (Gen 1)", "Arcanine (23/102) (Gen 1)"
-        ];
-
+        // ETB PROMOS
         const ETB_PROMOS = [
-            { rawString: "Snorlax Promo (Gen 1) — (Promo Holo)", val: 25.00, weight: 50 },
-            { rawString: "Lucario Promo (Gen 4) — (Promo Holo)", val: 20.00, weight: 40 },
-            { rawString: "Pikachu Promo (Gen 1) — (Promo Holo)", val: 30.00, weight: 25 },
-            { rawString: "Charizard Promo (Gen 1) — (Promo Holo)", val: 35.00, weight: 15 }
+            { rawString: "Flareon Premium Promo (Gen 1) — (SWSH Promo)", val: 25.00, weight: 25 },
+            { rawString: "Vaporeon Premium Promo (Gen 1) — (SWSH Promo)", val: 25.00, weight: 25 },
+            { rawString: "Jolteon Premium Promo (Gen 1) — (SWSH Promo)", val: 25.00, weight: 25 },
+            { rawString: "Snorlax Promo (Gen 1) — (Promo Holo)", val: 20.00, weight: 20 },
+            { rawString: "Lucario Promo (Gen 4) — (Promo Holo)", val: 20.00, weight: 20 },
+            { rawString: "Pikachu Promo (Gen 1) — (Promo Holo)", val: 25.00, weight: 20 },
+            { rawString: "Charizard Promo (Gen 1) — (Promo Holo)", val: 30.00, weight: 15 }
         ];
 
         const PRODUCTS = [
@@ -486,8 +548,6 @@
             { id: 'box', name: 'Booster Box (36 Packs)', price: 320, packs: 36 },
             { id: 'vintage', name: '1999 Vintage Base Set Pack', price: 1500, packs: 1 }
         ];
-
-        const RARITY_RANK = { 'Chase': 6, 'HeavyHit': 5, 'Filler': 4, 'Bulk': 3, 'Rare': 2, 'Uncommon': 1, 'Common': 0 };
 
         function updateUI() {
             document.getElementById('cash').innerText = cash.toFixed(2);
@@ -574,11 +634,11 @@
             return { name, gen, type };
         }
 
-        function buySupplyBundle() {
-            if (cash < 50.00) { alert("Not enough cash!"); return; }
-            cash -= 50.00;
-            sleevesCount++;
-            toploadersCount++;
+        function buySupplies(type, cost) {
+            if (cash < cost) { alert("Not enough cash!"); return; }
+            cash -= cost;
+            if (type === 'sleeve') sleevesCount += 10;
+            if (type === 'toploader') toploadersCount += 20;
             updateUI();
         }
 
@@ -679,11 +739,16 @@
         }
 
         function setupNextPack() {
-            currentPackCards = generateSinglePack(activeProduct.isVintage);
-            
+            currentPackCards = [];
+
             if (activeProduct.isETB && activeProduct.packsLeft === activeProduct.totalPacks) {
-                currentPackCards.push(generateETBPromoCard());
+                let promoCard = generateETBPromoCard();
+                promoCard.isETBPromo = true;
+                currentPackCards.push(promoCard);
             }
+
+            let packCards = generateSinglePack(activeProduct.isVintage);
+            currentPackCards.push(...packCards);
 
             currentCardIndex = 0;
             isAllFlipped = false;
@@ -718,14 +783,16 @@
             currentPackCards = [];
             let autoBulkCards = [];
 
+            if (activeProduct.isETB) {
+                let promoCard = generateETBPromoCard();
+                promoCard.isETBPromo = true;
+                currentPackCards.push(promoCard);
+            }
+
             for (let i = 0; i < activeProduct.totalPacks; i++) {
                 let fullPack = generateSinglePack(activeProduct.isVintage);
                 autoBulkCards.push(...fullPack.slice(0, 9));
                 currentPackCards.push(fullPack[9]);
-            }
-
-            if (activeProduct.isETB) {
-                currentPackCards.push(generateETBPromoCard());
             }
 
             autoBulkCards.forEach(c => inventory.push(c));
@@ -764,24 +831,26 @@
             let allPulledCards = [];
             let html = '';
 
+            if (activeProduct.isETB) {
+                let promoCard = generateETBPromoCard();
+                promoCard.isETBPromo = true;
+                allPulledCards.push(promoCard);
+            }
+
             for (let i = 0; i < activeProduct.totalPacks; i++) {
                 let pack = generateSinglePack(activeProduct.isVintage);
                 allPulledCards.push(...pack);
-            }
-
-            if (activeProduct.isETB) {
-                allPulledCards.push(generateETBPromoCard());
             }
 
             allPulledCards.forEach(c => inventory.push(c));
             updateUI();
 
             allPulledCards.forEach(card => {
-                let isHit = (card.tier === 'Chase' || card.tier === 'HeavyHit' || card.tier === 'Filler');
+                let isHit = (card.tier === 'Chase' || card.tier === 'HeavyHit' || card.tier === 'Filler' || card.isETBPromo);
                 html += `
                     <div class="open-all-card ${isHit ? 'is-hit' : ''}">
                         <div class="card-type-top">${card.selectedType}</div>
-                        <div class="card-name-middle" style="color:${isHit ? '#ffd700' : '#fff'}">${card.name}${card.isMisprint ? ' [MISPRINT]' : ''}</div>
+                        <div class="card-name-middle" style="color:${isHit ? '#ffd700' : '#fff'}">${card.name}${card.isMisprint ? ' [' + card.misprintType.toUpperCase() + ']' : ''}</div>
                         <div class="card-price-sub">$${getItemMarketValue(card).toFixed(2)}</div>
                         <div class="card-gen-bottom">${card.gen}</div>
                     </div>`;
@@ -801,54 +870,48 @@
         function generateSinglePack(isVintage = false) {
             let pack = [];
 
-            // 0.05% GOD PACK CHANCE
             let isGodPack = Math.random() <= 0.0005; 
 
             if (isGodPack) {
-                alert("🌟 GOD PACK UNLOCKED! ALL CARDS ARE HEAVY HITS OR CHASE CARDS!");
+                alert("🌟 GOD PACK UNLOCKED! ALL 10 CARDS ARE HEAVY HITS OR CHASE CARDS!");
                 for (let i = 0; i < 10; i++) {
-                    pack.push(rollLastCardHitSlot(isVintage));
+                    pack.push(rollLastCardHitSlot(isVintage, true));
                 }
+                pack.sort((a, b) => a.baseValue - b.baseValue);
                 return pack;
             }
 
-            // VINTAGE BASE SET PACK LOGIC (ONLY POKEMON #1-#151)
             if (isVintage) {
+                // Generate 6 Base Set Commons
                 for (let i = 0; i < 6; i++) {
-                    let cName = VINTAGE_BASE_COMMONS[Math.floor(Math.random() * VINTAGE_BASE_COMMONS.length)];
-                    pack.push(createCard(cName + " — (Base Set Common)", 'Common', 8.00));
+                    pack.push(createCard(VINTAGE_COMMONS[Math.floor(Math.random() * VINTAGE_COMMONS.length)], 'Common', 2.00));
                 }
+                // Generate 3 Base Set Uncommons
                 for (let i = 0; i < 3; i++) {
-                    let uName = VINTAGE_BASE_UNCOMMONS[Math.floor(Math.random() * VINTAGE_BASE_UNCOMMONS.length)];
-                    pack.push(createCard(uName + " — (Base Set Uncommon)", 'Uncommon', 18.00));
+                    pack.push(createCard(VINTAGE_UNCOMMONS[Math.floor(Math.random() * VINTAGE_UNCOMMONS.length)], 'Uncommon', 5.00));
                 }
+                
+                // Card 10: 33.3% chance for Holo, otherwise Non-Holo Rare
+                let isVintageHoloHit = Math.random() <= 0.333; 
 
-                // ROLL 16 VINTAGE HOLOS WEIGHTED BY MARKET VALUE (LEAST EXPENSIVE MOST COMMON)
-                let totalWeight = VINTAGE_BASE_HOLOS.reduce((acc, h) => acc + h.weight, 0);
-                let randomRoll = Math.random() * totalWeight;
-                let currentSum = 0;
-                let selectedHolo = VINTAGE_BASE_HOLOS[0];
-
-                for (let h of VINTAGE_BASE_HOLOS) {
-                    currentSum += h.weight;
-                    if (randomRoll <= currentSum) {
-                        selectedHolo = h;
-                        break;
-                    }
+                if (isVintageHoloHit) {
+                    let holo = VINTAGE_BASE_HOLOS_SORTED[Math.floor(Math.random() * VINTAGE_BASE_HOLOS_SORTED.length)];
+                    pack.push(createCard(holo.rawString, 'Chase', holo.val));
+                } else {
+                    let rareItem = VINTAGE_NONHOLO_RARES[Math.floor(Math.random() * VINTAGE_NONHOLO_RARES.length)];
+                    pack.push(createCard(rareItem.rawString, 'Rare', rareItem.val));
                 }
-                pack.push(createCard(selectedHolo.rawString, 'Chase', selectedHolo.val));
                 return pack;
             }
 
-            // STANDARD MODERN PACK LOGIC
-            for (let i = 0; i < 4; i++) pack.push(createCard(COMMONS[Math.floor(Math.random() * COMMONS.length)], 'Common', 0.50));
-            for (let i = 0; i < 3; i++) pack.push(createCard(COMMONS[Math.floor(Math.random() * COMMONS.length)], 'Uncommon', 1.50));
-            pack.push(createCard(COMMONS[Math.floor(Math.random() * COMMONS.length)], 'Rare', 3.00));
+            // Modern Packs
+            for (let i = 0; i < 5; i++) pack.push(createCard(COMMONS[Math.floor(Math.random() * COMMONS.length)], 'Common', 0.50));
+            for (let i = 0; i < 3; i++) pack.push(createCard(UNCOMMONS[Math.floor(Math.random() * UNCOMMONS.length)], 'Uncommon', 1.50));
             
             let bulkItem = TIER_1_BULK_LIST[Math.floor(Math.random() * TIER_1_BULK_LIST.length)];
             pack.push(createCard(bulkItem.rawString, 'Bulk', bulkItem.val));
 
-            pack.push(rollLastCardHitSlot());
+            pack.push(rollLastCardHitSlot(false));
             return pack;
         }
 
@@ -871,48 +934,86 @@
             return createCard(selectedPromo.rawString, 'HeavyHit', finalVal, hasStamp);
         }
 
-        // ROLL HIT SLOT (CHASE = 3.0%, HEAVY HIT = 15.0%, BULK = 82.0%)
-        function rollLastCardHitSlot(isVintage = false) {
+        function rollLastCardHitSlot(isVintage = false, forceGodPack = false) {
+            if (forceGodPack) {
+                let roll = Math.random() * 100;
+                if (roll <= 30.0) { 
+                    return rollChaseCard();
+                } else { 
+                    return rollHeavyHitCard();
+                }
+            }
+
+            if (isVintage) {
+                let isVintageHoloHit = Math.random() <= 0.333; 
+                if (isVintageHoloHit) {
+                    let holo = VINTAGE_BASE_HOLOS_SORTED[Math.floor(Math.random() * VINTAGE_BASE_HOLOS_SORTED.length)];
+                    return createCard(holo.rawString, 'Chase', holo.val);
+                } else {
+                    let rareItem = VINTAGE_NONHOLO_RARES[Math.floor(Math.random() * VINTAGE_NONHOLO_RARES.length)];
+                    return createCard(rareItem.rawString, 'Rare', rareItem.val);
+                }
+            }
+
             let roll = Math.random() * 100;
 
-            if (roll <= 3.0) { // 3.0% CHASE CHANCE
-                let subRoll = Math.random() * 100;
-
-                if (subRoll <= 1.0) {
-                    stats.moonbreonsPulled++;
-                    checkAchievements();
-                    return createCard("Umbreon (Gen 2) — (Gold Star, Moonbreon Alt Art)", 'Chase', 850.00);
-                } else if (subRoll <= 3.0) {
-                    return createCard("Charizard (Gen 1) — (Base Set Holo, GX, VMAX, Tera ex)", 'Chase', 350.00);
-                } else if (subRoll <= 5.0) {
-                    return createCard("Pikachu (Gen 1) — (VMAX, VSTAR, Stellar Tera ex)", 'Chase', 320.00);
-                } else {
-                    let item = TIER_4_CHASE_STANDARD[Math.floor(Math.random() * TIER_4_CHASE_STANDARD.length)];
-                    return createCard(item.rawString, 'Chase', item.val);
-                }
-            } else if (roll <= 18.0) { // 15.0% HEAVY HIT CHANCE (3.0% to 18.0%)
-                let totalWeight = TIER_3_HEAVY_LIST.reduce((acc, c) => acc + (c.weight || 10), 0);
-                let randomWeight = Math.random() * totalWeight;
-                let currentSum = 0;
-                let selectedItem = TIER_3_HEAVY_LIST[0];
-
-                for (let item of TIER_3_HEAVY_LIST) {
-                    currentSum += (item.weight || 10);
-                    if (randomWeight <= currentSum) {
-                        selectedItem = item;
-                        break;
-                    }
-                }
-                return createCard(selectedItem.rawString, 'HeavyHit', selectedItem.val);
-            } else { // 82.0% FILLER / BULK RATE
+            if (roll <= 0.7) { 
+                return rollChaseCard();
+            } else if (roll <= 5.7) { 
+                return rollHeavyHitCard();
+            } else if (roll <= 15.7) { 
                 let item = TIER_2_FILLER_LIST[Math.floor(Math.random() * TIER_2_FILLER_LIST.length)];
                 return createCard(item.rawString, 'Filler', item.val);
+            } else if (roll <= 50.0) { 
+                let rawStr = UNCOMMONS[Math.floor(Math.random() * UNCOMMONS.length)];
+                return createCard(rawStr, 'Uncommon', 1.50);
+            } else { 
+                let rawStr = COMMONS[Math.floor(Math.random() * COMMONS.length)];
+                return createCard(rawStr, 'Common', 0.50);
             }
+        }
+
+        function rollChaseCard() {
+            let subRoll = Math.random() * 100;
+
+            if (subRoll <= 10.0) { 
+                stats.moonbreonsPulled++;
+                checkAchievements();
+                return createCard("Umbreon (Gen 2) — (Gold Star, Moonbreon Alt Art)", 'Chase', 850.00);
+            } else if (subRoll <= 30.0) { 
+                return createCard("Charizard (Gen 1) — (Base Set Holo, GX, VMAX, Tera ex)", 'Chase', 350.00);
+            } else if (subRoll <= 50.0) { 
+                return createCard("Pikachu (Gen 1) — (VMAX, VSTAR, Stellar Tera ex)", 'Chase', 320.00);
+            } else { 
+                let item = TIER_4_CHASE_STANDARD[Math.floor(Math.random() * TIER_4_CHASE_STANDARD.length)];
+                return createCard(item.rawString, 'Chase', item.val);
+            }
+        }
+
+        function rollHeavyHitCard() {
+            let totalWeight = TIER_3_HEAVY_LIST.reduce((acc, c) => acc + (c.weight || 10), 0);
+            let randomWeight = Math.random() * totalWeight;
+            let currentSum = 0;
+            let selectedItem = TIER_3_HEAVY_LIST[0];
+
+            for (let item of TIER_3_HEAVY_LIST) {
+                currentSum += (item.weight || 10);
+                if (randomWeight <= currentSum) {
+                    selectedItem = item;
+                    break;
+                }
+            }
+            return createCard(selectedItem.rawString, 'HeavyHit', selectedItem.val);
         }
 
         function createCard(rawString, tier, baseVal, hasStamp = false) {
             let parsed = parseCardParts(rawString, hasStamp);
-            let isMisprint = Math.random() <= 0.01; // 1% Misprint Chance
+            let isMisprint = Math.random() <= 0.005; 
+            let misprintType = null;
+
+            if (isMisprint) {
+                misprintType = Math.random() < 0.5 ? "Square Cut" : "Inverted Back";
+            }
 
             return {
                 id: Date.now() + Math.random(),
@@ -924,7 +1025,8 @@
                 baseValue: baseVal,
                 state: 'Raw',
                 protection: 'none',
-                isMisprint: isMisprint
+                isMisprint: isMisprint,
+                misprintType: misprintType
             };
         }
 
@@ -958,10 +1060,18 @@
             stackContainer.innerHTML = '';
             document.getElementById('packControls').style.display = 'block';
             document.getElementById('packInstruction').style.display = 'block';
-            document.getElementById('packInstruction').innerText = `All ${currentPackCards.length} cards are stacked facedown! Click "Flip Cards" to flip them together.`;
-            document.getElementById('packStageTitle').innerText = currentOpeningMode === 'hits' 
-                ? `🔥 Hits Only Stack (${currentPackCards.length} Total Cards)`
-                : `Ripping Product (${activeProduct.totalPacks - activeProduct.packsLeft + 1} of ${activeProduct.totalPacks})`;
+            
+            let hasPromoOnTop = currentPackCards[0] && currentPackCards[0].isETBPromo;
+            
+            if (hasPromoOnTop) {
+                document.getElementById('packStageTitle').innerText = `🎁 Guaranteed ETB Promo Card Revealed First!`;
+                document.getElementById('packInstruction').innerText = `Click "Flip Cards" to reveal your guaranteed promo before starting pack 1!`;
+            } else {
+                document.getElementById('packStageTitle').innerText = currentOpeningMode === 'hits' 
+                    ? `🔥 Hits Only Stack (${currentPackCards.length} Total Cards)`
+                    : `Ripping Product (${activeProduct.totalPacks - activeProduct.packsLeft + 1} of ${activeProduct.totalPacks})`;
+                document.getElementById('packInstruction').innerText = `All ${currentPackCards.length} cards are stacked facedown! Click "Flip Cards" to flip them together.`;
+            }
 
             activeCardElements = [];
             currentCardIndex = 0;
@@ -971,7 +1081,7 @@
 
             currentPackCards.forEach((card, idx) => {
                 let cardEl = document.createElement('div');
-                cardEl.className = 'physical-card';
+                cardEl.className = 'physical-card' + (card.isETBPromo ? ' is-promo-card' : '');
                 
                 let offset = Math.min(idx * 0.8, 35);
                 cardEl.style.top = `${offset}px`;
@@ -980,11 +1090,11 @@
 
                 cardEl.innerHTML = `
                     <div class="physical-card-inner">
-                        <div class="physical-card-back">TCG CARD</div>
+                        <div class="physical-card-back">${card.isETBPromo ? '⭐ PROMO CARD ⭐' : 'TCG CARD'}</div>
                         <div class="physical-card-front rarity-${card.tier}">
                             <div class="card-type-top">${card.selectedType}</div>
                             <div style="text-align:center;">
-                                <div class="card-name-middle">${card.name}${card.isMisprint ? ' <span style="color:#ff0055;">[MISPRINT]</span>' : ''}</div>
+                                <div class="card-name-middle">${card.name}${card.isMisprint ? ' <span style="color:#ff0055;">[' + card.misprintType.toUpperCase() + ']</span>' : ''}</div>
                                 <div class="card-price-sub">$${getItemMarketValue(card).toFixed(2)}</div>
                             </div>
                             <div class="card-gen-bottom">${card.gen}</div>
@@ -1090,7 +1200,7 @@
                     : '';
 
                 let misprintTag = card.isMisprint
-                    ? `<span class="tag tag-misprint">MISPRINT 2.5x</span>`
+                    ? `<span class="tag tag-misprint">${card.misprintType.toUpperCase()} (2.5x)</span>`
                     : '';
 
                 html += `
@@ -1146,25 +1256,32 @@
             cash -= fee;
 
             let roll = Math.random() * 100;
-            let finalGrade = 10;
+            let finalGrade = 10.0;
             let isBlackLabel = false;
 
-            // BASE GEM MINT 10 CHANCE IS 40%
-            let gemMintChance = 40.0;
-            if (card.protection === 'toploader') gemMintChance += 10.0; // TOPLOADER BOOSTS TO 50% (+10%)
-            if (card.protection === 'sleeve') gemMintChance += 5.0;     // SLEEVE BOOSTS TO 45% (+5%)
-
-            if (roll <= gemMintChance) {
-                finalGrade = 10.0;
-                // STRICT BLACK LABEL CHANCE (1% BASE, 2% IF TOPLOADED)
-                let blackLabelChance = (card.protection === 'toploader') ? 0.02 : 0.01;
-                if (company === 'Beckett' && Math.random() <= blackLabelChance) {
-                    isBlackLabel = true;
+            if (card.protection === 'toploader') {
+                if (roll <= 35.0) {
+                    finalGrade = 10.0;
+                    if (company === 'Beckett' && Math.random() <= 0.05) isBlackLabel = true;
+                } else {
+                    finalGrade = 9.5;
                 }
-            } else if (roll <= 80.0) {
-                finalGrade = (company === 'Beckett' || company === 'CGC') ? 9.5 : 9.0;
+            } else if (card.protection === 'sleeve') {
+                if (roll <= 45.0) {
+                    finalGrade = 10.0;
+                    if (company === 'Beckett' && Math.random() <= 0.03) isBlackLabel = true;
+                } else {
+                    finalGrade = 9.0;
+                }
             } else {
-                finalGrade = 8.5;
+                if (roll <= 40.0) {
+                    finalGrade = 10.0;
+                    if (company === 'Beckett' && Math.random() <= 0.01) isBlackLabel = true;
+                } else if (roll <= 75.0) {
+                    finalGrade = 9.0;
+                } else {
+                    finalGrade = 8.0;
+                }
             }
 
             if (finalGrade === 10 || isBlackLabel) {
@@ -1197,8 +1314,23 @@
         function unlockAch(ach) {
             ach.unlocked = true;
             cash += ach.reward;
-            alert(`🏆 ACHIEVEMENT UNLOCKED: ${ach.name}!\nReward: +$${ach.reward}.00`);
+
+            if (ach.id === 'moonbreon_grail') {
+                showGoldBanner();
+            } else {
+                alert(`🏆 ACHIEVEMENT UNLOCKED: ${ach.name}!\nReward: +$${ach.reward}.00`);
+            }
+
             updateUI();
+        }
+
+        function showGoldBanner() {
+            let banner = document.getElementById('grailBanner');
+            banner.classList.add('show');
+            
+            setTimeout(() => {
+                banner.classList.remove('show');
+            }, 4000);
         }
 
         function renderAchievements() {
