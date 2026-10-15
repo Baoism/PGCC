@@ -145,6 +145,17 @@
             transition: transform 0.6s ease, opacity 0.5s ease;
         }
 
+        .physical-card.is-promo-card {
+            box-shadow: 0 0 20px #f72585, 0 0 35px #8e2de2;
+            border: 2px solid #ffd700 !important;
+            animation: promoGlowPulse 1.5s infinite alternate;
+        }
+
+        @keyframes promoGlowPulse {
+            0% { transform: scale(1); box-shadow: 0 0 15px #f72585; }
+            100% { transform: scale(1.03); box-shadow: 0 0 30px #ffd700; }
+        }
+
         .physical-card-inner {
             width: 100%; height: 100%; position: relative;
             transform-style: preserve-3d; transition: transform 0.6s ease-in-out;
@@ -339,7 +350,7 @@
 
                     <div id="etbGraphic" class="etb-wrapper" style="display:none;" onclick="startRipAnimation()">
                         <div style="font-size: 18px;">🎁 ELITE TRAINER BOX</div>
-                        <div style="font-size: 12px; color: #f72585; margin-top: 6px;">Contains 8 Booster Packs + Promo</div>
+                        <div style="font-size: 12px; color: #f72585; margin-top: 6px;">Contains 8 Booster Packs + Guaranteed Promo</div>
                         <div style="font-size: 11px; color: #aaa; margin-top: 12px;">(Click to Lift Box Lid 📦)</div>
                     </div>
 
@@ -436,7 +447,6 @@
             "Greedent (Gen 8) — (Uncommon Holo)", "Bidoof (Gen 4) — (Standard Holo)"
         ];
 
-        // VINTAGE 1999 BASE SET CARDS (ORIGINAL 151 POKEMON ONLY)
         const VINTAGE_COMMONS = [
             "Bulbasaur #44/102 (Gen 1) — (Base Set)", "Charmander #46/102 (Gen 1) — (Base Set)",
             "Squirtle #63/102 (Gen 1) — (Base Set)", "Caterpie #45/102 (Gen 1) — (Base Set)",
@@ -452,7 +462,6 @@
             "Porygon #39/102 (Gen 1) — (Base Set)", "Wartortle #42/102 (Gen 1) — (Base Set)"
         ];
 
-        // 16 BASE SET HOLOS ORDERED FROM LEAST EXPENSIVE TO MOST EXPENSIVE
         const VINTAGE_BASE_HOLOS_SORTED = [
             { rawString: "Hitmonchan 7/102 (Gen 1) — (Base Set Holo)", val: 17.50 },
             { rawString: "Magneton 9/102 (Gen 1) — (Base Set Holo)", val: 33.00 },
@@ -506,19 +515,20 @@
         ];
 
         const TIER_4_CHASE_STANDARD = [
-            { rawString: "Vaporeon (Gen 1) — (VMAX, Premium Promo)", val: 120.00 },
-            { rawString: "Jolteon (Gen 1) — (VMAX, Premium Promo)", val: 120.00 },
-            { rawString: "Flareon (Gen 1) — (VMAX, Premium Promo)", val: 120.00 },
             { rawString: "Roaring Moon (Gen 9) — (Ancient ex SIR)", val: 180.00 },
             { rawString: "Giratina (Gen 4) — (GX, VSTAR, Alt Art)", val: 280.00 },
             { rawString: "Lugia (Gen 2) — (LEGEND, VSTAR, Alt Art)", val: 350.00 }
         ];
 
+        // UPDATED ETB PROMO POOL WITH FLAREON, VAPOREON & JOLTEON AT $25
         const ETB_PROMOS = [
-            { rawString: "Snorlax Promo (Gen 1) — (Promo Holo)", val: 25.00, weight: 50 },
-            { rawString: "Lucario Promo (Gen 4) — (Promo Holo)", val: 20.00, weight: 40 },
-            { rawString: "Pikachu Promo (Gen 1) — (Promo Holo)", val: 30.00, weight: 25 },
-            { rawString: "Charizard Promo (Gen 1) — (Promo Holo)", val: 35.00, weight: 15 }
+            { rawString: "Flareon Premium Promo (Gen 1) — (SWSH Promo)", val: 25.00, weight: 25 },
+            { rawString: "Vaporeon Premium Promo (Gen 1) — (SWSH Promo)", val: 25.00, weight: 25 },
+            { rawString: "Jolteon Premium Promo (Gen 1) — (SWSH Promo)", val: 25.00, weight: 25 },
+            { rawString: "Snorlax Promo (Gen 1) — (Promo Holo)", val: 20.00, weight: 20 },
+            { rawString: "Lucario Promo (Gen 4) — (Promo Holo)", val: 20.00, weight: 20 },
+            { rawString: "Pikachu Promo (Gen 1) — (Promo Holo)", val: 25.00, weight: 20 },
+            { rawString: "Charizard Promo (Gen 1) — (Promo Holo)", val: 30.00, weight: 15 }
         ];
 
         const PRODUCTS = [
@@ -719,11 +729,17 @@
         }
 
         function setupNextPack() {
-            currentPackCards = generateSinglePack(activeProduct.isVintage);
-            
+            currentPackCards = [];
+
+            // IF ETB AND FIRST PACK REVEAL: PLACE GUARANTEED PROMO CARD FIRST IN STACK
             if (activeProduct.isETB && activeProduct.packsLeft === activeProduct.totalPacks) {
-                currentPackCards.push(generateETBPromoCard());
+                let promoCard = generateETBPromoCard();
+                promoCard.isETBPromo = true; // Mark as standalone promo
+                currentPackCards.push(promoCard);
             }
+
+            let packCards = generateSinglePack(activeProduct.isVintage);
+            currentPackCards.push(...packCards);
 
             currentCardIndex = 0;
             isAllFlipped = false;
@@ -758,14 +774,16 @@
             currentPackCards = [];
             let autoBulkCards = [];
 
+            if (activeProduct.isETB) {
+                let promoCard = generateETBPromoCard();
+                promoCard.isETBPromo = true;
+                currentPackCards.push(promoCard);
+            }
+
             for (let i = 0; i < activeProduct.totalPacks; i++) {
                 let fullPack = generateSinglePack(activeProduct.isVintage);
                 autoBulkCards.push(...fullPack.slice(0, 9));
                 currentPackCards.push(fullPack[9]);
-            }
-
-            if (activeProduct.isETB) {
-                currentPackCards.push(generateETBPromoCard());
             }
 
             autoBulkCards.forEach(c => inventory.push(c));
@@ -804,20 +822,22 @@
             let allPulledCards = [];
             let html = '';
 
+            if (activeProduct.isETB) {
+                let promoCard = generateETBPromoCard();
+                promoCard.isETBPromo = true;
+                allPulledCards.push(promoCard);
+            }
+
             for (let i = 0; i < activeProduct.totalPacks; i++) {
                 let pack = generateSinglePack(activeProduct.isVintage);
                 allPulledCards.push(...pack);
-            }
-
-            if (activeProduct.isETB) {
-                allPulledCards.push(generateETBPromoCard());
             }
 
             allPulledCards.forEach(c => inventory.push(c));
             updateUI();
 
             allPulledCards.forEach(card => {
-                let isHit = (card.tier === 'Chase' || card.tier === 'HeavyHit' || card.tier === 'Filler');
+                let isHit = (card.tier === 'Chase' || card.tier === 'HeavyHit' || card.tier === 'Filler' || card.isETBPromo);
                 html += `
                     <div class="open-all-card ${isHit ? 'is-hit' : ''}">
                         <div class="card-type-top">${card.selectedType}</div>
@@ -841,7 +861,6 @@
         function generateSinglePack(isVintage = false) {
             let pack = [];
 
-            // 0.05% GOD PACK CHANCE (1 in 2000 packs)
             let isGodPack = Math.random() <= 0.0005; 
 
             if (isGodPack) {
@@ -849,13 +868,11 @@
                 for (let i = 0; i < 10; i++) {
                     pack.push(rollLastCardHitSlot(isVintage, true));
                 }
-                // SORT GOD PACK LEAST TO GREATEST COST (BASE VALUE)
                 pack.sort((a, b) => a.baseValue - b.baseValue);
                 return pack;
             }
 
             if (isVintage) {
-                // Strictly 1999 Base Set Pokémon cards (151 First Gen Only)
                 for (let i = 0; i < 6; i++) {
                     pack.push(createCard(VINTAGE_COMMONS[Math.floor(Math.random() * VINTAGE_COMMONS.length)], 'Common', 2.00));
                 }
@@ -863,11 +880,9 @@
                     pack.push(createCard(VINTAGE_UNCOMMONS[Math.floor(Math.random() * VINTAGE_UNCOMMONS.length)], 'Uncommon', 5.00));
                 }
                 
-                // 1 in 3 chance for Base Set Holo Hit
                 let isVintageHoloHit = Math.random() <= 0.333; 
 
                 if (isVintageHoloHit) {
-                    // Pick a random Base Set Holo from the 16 Holos
                     let holo = VINTAGE_BASE_HOLOS_SORTED[Math.floor(Math.random() * VINTAGE_BASE_HOLOS_SORTED.length)];
                     pack.push(createCard(holo.rawString, 'Chase', holo.val));
                 } else {
@@ -876,7 +891,6 @@
                 return pack;
             }
 
-            // Standard Packs
             for (let i = 0; i < 5; i++) pack.push(createCard(COMMONS[Math.floor(Math.random() * COMMONS.length)], 'Common', 0.50));
             for (let i = 0; i < 3; i++) pack.push(createCard(UNCOMMONS[Math.floor(Math.random() * UNCOMMONS.length)], 'Uncommon', 1.50));
             
@@ -916,7 +930,6 @@
                 }
             }
 
-            // Hit rates: Common 50%, Uncommon 34.3%, Filler 10%, Heavy 5%, Chase 0.7%
             let roll = Math.random() * 100;
 
             if (roll <= 0.7) { 
@@ -1022,10 +1035,18 @@
             stackContainer.innerHTML = '';
             document.getElementById('packControls').style.display = 'block';
             document.getElementById('packInstruction').style.display = 'block';
-            document.getElementById('packInstruction').innerText = `All ${currentPackCards.length} cards are stacked facedown! Click "Flip Cards" to flip them together.`;
-            document.getElementById('packStageTitle').innerText = currentOpeningMode === 'hits' 
-                ? `🔥 Hits Only Stack (${currentPackCards.length} Total Cards)`
-                : `Ripping Product (${activeProduct.totalPacks - activeProduct.packsLeft + 1} of ${activeProduct.totalPacks})`;
+            
+            let hasPromoOnTop = currentPackCards[0] && currentPackCards[0].isETBPromo;
+            
+            if (hasPromoOnTop) {
+                document.getElementById('packStageTitle').innerText = `🎁 Guaranteed ETB Promo Card Revealed First!`;
+                document.getElementById('packInstruction').innerText = `Click "Flip Cards" to reveal your guaranteed promo before starting pack 1!`;
+            } else {
+                document.getElementById('packStageTitle').innerText = currentOpeningMode === 'hits' 
+                    ? `🔥 Hits Only Stack (${currentPackCards.length} Total Cards)`
+                    : `Ripping Product (${activeProduct.totalPacks - activeProduct.packsLeft + 1} of ${activeProduct.totalPacks})`;
+                document.getElementById('packInstruction').innerText = `All ${currentPackCards.length} cards are stacked facedown! Click "Flip Cards" to flip them together.`;
+            }
 
             activeCardElements = [];
             currentCardIndex = 0;
@@ -1035,7 +1056,7 @@
 
             currentPackCards.forEach((card, idx) => {
                 let cardEl = document.createElement('div');
-                cardEl.className = 'physical-card';
+                cardEl.className = 'physical-card' + (card.isETBPromo ? ' is-promo-card' : '');
                 
                 let offset = Math.min(idx * 0.8, 35);
                 cardEl.style.top = `${offset}px`;
@@ -1044,7 +1065,7 @@
 
                 cardEl.innerHTML = `
                     <div class="physical-card-inner">
-                        <div class="physical-card-back">TCG CARD</div>
+                        <div class="physical-card-back">${card.isETBPromo ? '⭐ PROMO CARD ⭐' : 'TCG CARD'}</div>
                         <div class="physical-card-front rarity-${card.tier}">
                             <div class="card-type-top">${card.selectedType}</div>
                             <div style="text-align:center;">
@@ -1192,7 +1213,6 @@
             }
         }
 
-        // UPDATED GRADING ODDS LOGIC (+10% TOPLOADER BOOST AND REBALANCED BLACK LABELS)
         function gradeCard(cardId) {
             let card = inventory.find(c => c.id == cardId);
             if (!card) return;
@@ -1215,25 +1235,23 @@
             let isBlackLabel = false;
 
             if (card.protection === 'toploader') {
-                // Toploader increases PSA 10 chance by +10% over base (40% base -> 50% max)
                 if (roll <= 50.0) {
                     finalGrade = 10.0;
-                    if (company === 'Beckett' && Math.random() <= 0.05) isBlackLabel = true; // 5% Black Label chance
+                    if (company === 'Beckett' && Math.random() <= 0.05) isBlackLabel = true;
                 } else {
                     finalGrade = 9.5;
                 }
             } else if (card.protection === 'sleeve') {
                 if (roll <= 45.0) {
                     finalGrade = 10.0;
-                    if (company === 'Beckett' && Math.random() <= 0.03) isBlackLabel = true; // 3% Black Label chance
+                    if (company === 'Beckett' && Math.random() <= 0.03) isBlackLabel = true;
                 } else {
                     finalGrade = 9.0;
                 }
             } else {
-                // Raw / Unprotected cards
                 if (roll <= 40.0) {
                     finalGrade = 10.0;
-                    if (company === 'Beckett' && Math.random() <= 0.01) isBlackLabel = true; // 1% Black Label chance
+                    if (company === 'Beckett' && Math.random() <= 0.01) isBlackLabel = true;
                 } else if (roll <= 75.0) {
                     finalGrade = 9.0;
                 } else {
