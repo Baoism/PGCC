@@ -635,7 +635,6 @@
             return { name, gen, type };
         }
 
-        // FIXED: single supplies for $50.00
         function buySupplies(type, cost) {
             if (cash < cost) { alert("Not enough cash!"); return; }
             cash -= cost;
@@ -644,7 +643,6 @@
             updateUI();
         }
 
-        // FIXED: String vs Number loose equality comparison bug for card.id
         function applyProtection(cardId, protectionType) {
             let card = inventory.find(c => String(c.id) === String(cardId));
             if (!card) return;
@@ -682,7 +680,7 @@
             let p = PRODUCTS.find(prod => prod.id === prodId);
             if (cash < p.price) { alert("Not enough cash!"); return; }
             cash -= p.price;
-            sealedVault.push({ ...p, id: Date.now() + Math.random() });
+            sealedVault.push({ ...p, id: String(Date.now() + Math.random()) });
             updateUI();
         }
 
@@ -697,9 +695,9 @@
                             <span class="tag tag-sealed">${item.packs} Pack(s)</span>
                         </div>
                         <div class="sealed-buttons">
-                            <button onclick="ripProduct(${item.id}, 'regular')">Open Product ✂️</button>
-                            <button onclick="ripProduct(${item.id}, 'hits')" style="background:#ff9800; color:#fff;">Hits Only Stack 🔥</button>
-                            <button onclick="ripProduct(${item.id}, 'open_all')" style="background:#2196F3; color:#fff;">Open All ⚡</button>
+                            <button onclick="ripProduct('${item.id}', 'regular')">Open Product ✂️</button>
+                            <button onclick="ripProduct('${item.id}', 'hits')" style="background:#ff9800; color:#fff;">Hits Only Stack 🔥</button>
+                            <button onclick="ripProduct('${item.id}', 'open_all')" style="background:#2196F3; color:#fff;">Open All ⚡</button>
                         </div>
                     </div>`;
             });
@@ -707,22 +705,22 @@
         }
 
         function ripProduct(id, mode) {
-            let index = sealedVault.findIndex(item => item.id === id);
+            let index = sealedVault.findIndex(item => String(item.id) === String(id));
             if (index === -1) return;
             let item = sealedVault.splice(index, 1)[0];
             
-            if (item.id === 'box') {
+            if (item.prodId === 'box' || item.id === 'box') {
                 stats.totalBoxesOpened++;
                 checkAchievements();
             }
 
             activeProduct = {
                 name: item.name,
-                prodId: item.id,
+                prodId: item.prodId || item.id,
                 packsLeft: item.packs,
                 totalPacks: item.packs,
-                isETB: (item.id === 'etb'),
-                isVintage: (item.id === 'vintage')
+                isETB: (item.prodId === 'etb' || item.id === 'etb'),
+                isVintage: (item.prodId === 'vintage' || item.id === 'vintage')
             };
 
             currentOpeningMode = mode;
@@ -813,8 +811,8 @@
 
             for (let i = 0; i < activeProduct.totalPacks; i++) {
                 let fullPack = generateSinglePack(activeProduct.isVintage);
-                autoBulkCards.push(...fullPack.slice(0, 9));
-                currentPackCards.push(fullPack[9]);
+                autoBulkCards.push(...fullPack.slice(0, fullPack.length - 1));
+                currentPackCards.push(fullPack[fullPack.length - 1]);
             }
 
             autoBulkCards.forEach(c => inventory.push(c));
@@ -911,15 +909,7 @@
                     pack.push(createCard(VINTAGE_UNCOMMONS[Math.floor(Math.random() * VINTAGE_UNCOMMONS.length)], 'Uncommon', 5.00));
                 }
                 
-                let isVintageHoloHit = Math.random() <= 0.333; 
-
-                if (isVintageHoloHit) {
-                    let holo = VINTAGE_BASE_HOLOS_SORTED[Math.floor(Math.random() * VINTAGE_BASE_HOLOS_SORTED.length)];
-                    pack.push(createCard(holo.rawString, 'Chase', holo.val));
-                } else {
-                    let rareItem = VINTAGE_NONHOLO_RARES[Math.floor(Math.random() * VINTAGE_NONHOLO_RARES.length)];
-                    pack.push(createCard(rareItem.rawString, 'Rare', rareItem.val));
-                }
+                pack.push(rollLastCardHitSlot(true, false));
                 return pack;
             }
 
@@ -953,16 +943,11 @@
         }
 
         function rollLastCardHitSlot(isVintage = false, forceGodPack = false) {
-            if (forceGodPack) {
-                let roll = Math.random() * 100;
-                if (roll <= 30.0) { 
-                    return rollChaseCard();
-                } else { 
-                    return rollHeavyHitCard();
-                }
-            }
-
             if (isVintage) {
+                if (forceGodPack) {
+                    let holo = VINTAGE_BASE_HOLOS_SORTED[Math.floor(Math.random() * VINTAGE_BASE_HOLOS_SORTED.length)];
+                    return createCard(holo.rawString, 'Chase', holo.val);
+                }
                 let isVintageHoloHit = Math.random() <= 0.333; 
                 if (isVintageHoloHit) {
                     let holo = VINTAGE_BASE_HOLOS_SORTED[Math.floor(Math.random() * VINTAGE_BASE_HOLOS_SORTED.length)];
@@ -970,6 +955,15 @@
                 } else {
                     let rareItem = VINTAGE_NONHOLO_RARES[Math.floor(Math.random() * VINTAGE_NONHOLO_RARES.length)];
                     return createCard(rareItem.rawString, 'Rare', rareItem.val);
+                }
+            }
+
+            if (forceGodPack) {
+                let roll = Math.random() * 100;
+                if (roll <= 30.0) { 
+                    return rollChaseCard();
+                } else { 
+                    return rollHeavyHitCard();
                 }
             }
 
@@ -1034,7 +1028,7 @@
             }
 
             return {
-                id: Date.now() + Math.random(),
+                id: String(Date.now() + Math.random()),
                 fullName: rawString,
                 name: parsed.name,
                 gen: parsed.gen,
