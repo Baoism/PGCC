@@ -99,6 +99,23 @@
             100% { transform: translateY(-250px) scale(0) rotate(-15deg); opacity: 0; }
         }
 
+        .promo-wrapper {
+            width: 220px; height: 160px; background: linear-gradient(135deg, #f72585, #ffd700);
+            margin: 40px auto; border-radius: 14px; border: 3px solid #fff;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            font-weight: bold; color: #111; cursor: pointer; position: relative;
+            box-shadow: 0 0 30px rgba(247, 37, 133, 0.8); transition: transform 0.3s;
+        }
+        .promo-wrapper:hover { transform: scale(1.08) rotate(3deg); box-shadow: 0 0 45px rgba(255, 215, 0, 0.9); }
+        .promo-wrapper.unboxing { animation: unboxPromoFancy 0.85s forwards ease-in-out; }
+
+        @keyframes unboxPromoFancy {
+            0% { transform: scale(1) rotate(0deg); filter: brightness(1); }
+            30% { transform: scale(1.2) rotate(-8deg); filter: brightness(1.4); box-shadow: 0 0 60px #ffd700; }
+            60% { transform: scale(1.25) rotate(8deg); filter: brightness(1.6); }
+            100% { transform: scale(0) rotate(-20deg) translateY(-180px); opacity: 0; }
+        }
+
         .box-wrapper {
             width: 300px; height: 230px; background: linear-gradient(135deg, #00c6ff, #0072ff);
             margin: 30px auto; border-radius: 16px; border: 4px solid #00f2fe;
@@ -354,6 +371,12 @@
                         <div style="font-size: 11px; color: #aaa; margin-top: 12px;">(Click to Lift Box Lid 📦)</div>
                     </div>
 
+                    <div id="etbPromoGraphic" class="promo-wrapper" style="display:none;" onclick="startPromoAnimation()">
+                        <div style="font-size: 18px;">✨ ETB PROMO FOIL PACK</div>
+                        <div style="font-size: 12px; color: #000; margin-top: 6px;">Guaranteed Sealed Foil Promo</div>
+                        <div style="font-size: 11px; color: #222; margin-top: 12px;">(Click to Unbox Promo ✂️)</div>
+                    </div>
+
                     <div id="boosterBoxGraphic" class="box-wrapper" style="display:none;" onclick="startRipAnimation()">
                         <div style="font-size: 20px;">📦 BOOSTER BOX</div>
                         <div style="font-size: 13px; color: #4cc9f0; margin-top: 6px;">36 Packs Sealed Display</div>
@@ -531,7 +554,7 @@
             { rawString: "Lugia (Gen 2) — (LEGEND, VSTAR, Alt Art)", val: 350.00 }
         ];
 
-        // ETB PROMOS
+        // ETB PROMOS (UPDATED: Flareon, Vaporeon, Jolteon are $25.00 Promos)
         const ETB_PROMOS = [
             { rawString: "Flareon Premium Promo (Gen 1) — (SWSH Promo)", val: 25.00, weight: 25 },
             { rawString: "Vaporeon Premium Promo (Gen 1) — (SWSH Promo)", val: 25.00, weight: 25 },
@@ -754,6 +777,7 @@
 
             document.getElementById('packGraphic').style.display = 'none';
             document.getElementById('boosterBoxGraphic').style.display = 'none';
+            document.getElementById('etbPromoGraphic').style.display = 'none';
             
             let etbG = document.getElementById('etbGraphic');
             etbG.style.display = 'flex';
@@ -763,7 +787,18 @@
             document.getElementById('cardStack').innerHTML = '';
             document.getElementById('packControls').style.display = 'none';
             document.getElementById('packInstruction').style.display = 'none';
-            document.getElementById('packStageTitle').innerText = `🎁 Opening ETB! Click Lid to Claim Guaranteed Promo Card!`;
+            document.getElementById('packStageTitle').innerText = `🎁 Opening ETB! Click Lid to Unbox Guaranteed Promo Foil Pack!`;
+        }
+
+        function startPromoAnimation() {
+            let promoGraphic = document.getElementById('etbPromoGraphic');
+            promoGraphic.classList.add('unboxing');
+
+            setTimeout(() => {
+                promoGraphic.style.display = 'none';
+                promoGraphic.classList.remove('unboxing');
+                renderPhysicalCardStack();
+            }, 850);
         }
 
         function setupNextPack() {
@@ -775,6 +810,7 @@
 
             document.getElementById('packGraphic').style.display = 'none';
             document.getElementById('etbGraphic').style.display = 'none';
+            document.getElementById('etbPromoGraphic').style.display = 'none';
             document.getElementById('boosterBoxGraphic').style.display = 'none';
 
             if (activeProduct.totalPacks === 8) {
@@ -823,6 +859,7 @@
 
             document.getElementById('packGraphic').style.display = 'none';
             document.getElementById('etbGraphic').style.display = 'none';
+            document.getElementById('etbPromoGraphic').style.display = 'none';
             document.getElementById('boosterBoxGraphic').style.display = 'none';
 
             if (activeProduct.totalPacks === 8) {
@@ -843,6 +880,7 @@
         function executeOpenAll() {
             document.getElementById('packGraphic').style.display = 'none';
             document.getElementById('etbGraphic').style.display = 'none';
+            document.getElementById('etbPromoGraphic').style.display = 'none';
             document.getElementById('boosterBoxGraphic').style.display = 'none';
             document.getElementById('cardStack').style.display = 'none';
             document.getElementById('packControls').style.display = 'block';
@@ -1049,7 +1087,7 @@
             if (activeProduct.totalPacks === 8 && isPromoOpeningPhase) {
                 activeGraphic = document.getElementById('etbGraphic');
                 activeGraphic.classList.add('opening');
-                duration = 900;
+                duration = 950;
             } else if (activeProduct.totalPacks === 36) {
                 activeGraphic = document.getElementById('boosterBoxGraphic');
                 activeGraphic.classList.add('opening');
@@ -1062,7 +1100,14 @@
 
             setTimeout(() => {
                 if (activeGraphic) activeGraphic.style.display = 'none';
-                renderPhysicalCardStack();
+                
+                if (activeProduct.totalPacks === 8 && isPromoOpeningPhase) {
+                    let promoGraphic = document.getElementById('etbPromoGraphic');
+                    promoGraphic.style.display = 'flex';
+                    document.getElementById('packStageTitle').innerText = `✨ ETB Lid Lifted! Click Promo Foil Pack to Unbox Card!`;
+                } else {
+                    renderPhysicalCardStack();
+                }
             }, duration);
         }
 
